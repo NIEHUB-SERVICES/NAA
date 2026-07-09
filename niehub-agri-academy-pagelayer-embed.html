@@ -1,0 +1,1153 @@
+<!-- =====================================================================
+ NIEHUB AGRI ACADEMY — Pagelayer embed
+ Paste this ENTIRE block into a Pagelayer "HTML" / "Code" widget on your page.
+ All styles are scoped to .niehub-app-scope so they will not affect the rest
+ of your WordPress theme.
+===================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.niehub-app-scope{
+    --bg:#F5F6F1;
+    --surface:#FFFFFF;
+    --surface-alt:#EDF1E9;
+    --ink:#1E2A22;
+    --ink-soft:#5C6B60;
+    --primary:#2F6E4F;
+    --primary-dark:#20503A;
+    --primary-tint:#E3EEE7;
+    --amber:#D98E2B;
+    --amber-tint:#FBF0DD;
+    --brown:#8B5E34;
+    --danger:#B84C3E;
+    --danger-tint:#F7E7E4;
+    --border:#DDE3D9;
+    --radius:10px;
+  }
+.niehub-app-scope *{box-sizing:border-box;}
+.niehub-app-scope{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
+.niehub-app-scope h1, .niehub-app-scope h2, .niehub-app-scope h3, .niehub-app-scope h4, .niehub-app-scope .brand, .niehub-app-scope .nav-label{font-family:'Manrope',sans-serif;}
+.niehub-app-scope button{font-family:inherit;cursor:pointer;}
+.niehub-app-scope input, .niehub-app-scope select, .niehub-app-scope textarea{font-family:inherit;}
+.niehub-app-scope a{color:inherit;}
+.niehub-app-scope /* ---------- Login ---------- */
+  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.niehub-app-scope .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;max-width:420px;width:100%;box-shadow:0 2px 24px rgba(30,42,34,0.06);}
+.niehub-app-scope .login-mark{width:44px;height:44px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Manrope';margin-bottom:18px;}
+.niehub-app-scope .login-card h1{font-size:22px;margin:0 0 4px;}
+.niehub-app-scope .login-card p.sub{color:var(--ink-soft);margin:0 0 26px;font-size:14px;}
+.niehub-app-scope .role-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);text-align:left;font-size:14px;font-weight:600;color:var(--ink);transition:.15s;}
+.niehub-app-scope .role-btn:hover{border-color:var(--primary);background:var(--primary-tint);}
+.niehub-app-scope .role-btn .dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;}
+.niehub-app-scope .login-back{background:none;border:none;color:var(--ink-soft);font-size:13px;margin-bottom:16px;padding:0;text-decoration:underline;}
+.niehub-app-scope .field-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;}
+.niehub-app-scope /* ---------- Shell ---------- */
+  #app-shell{display:none;min-height:100vh;}
+.niehub-app-scope .sidebar{width:230px;flex-shrink:0;background:var(--primary-dark);color:#EAF1EC;min-height:100vh;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.niehub-app-scope .sidebar .brand{color:#fff;font-weight:800;font-size:16px;padding:6px 10px 20px;line-height:1.25;}
+.niehub-app-scope .sidebar .brand small{display:block;font-family:'Inter';font-weight:500;font-size:11px;color:#A9C4B4;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+.niehub-app-scope .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:#CFE0D5;margin-bottom:2px;}
+.niehub-app-scope .nav-item:hover{background:rgba(255,255,255,0.06);cursor:pointer;}
+.niehub-app-scope .nav-item.active{background:#fff;color:var(--primary-dark);}
+.niehub-app-scope .nav-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#7FA491;margin:18px 10px 6px;}
+.niehub-app-scope .sidebar-footer{margin-top:24px;padding:12px 10px;border-top:1px solid rgba(255,255,255,0.12);}
+.niehub-app-scope .who{font-size:13px;font-weight:700;color:#fff;}
+.niehub-app-scope .who-role{font-size:11px;color:#9FC2AC;margin-bottom:8px;}
+.niehub-app-scope .switch-btn{font-size:12px;color:#CFE0D5;background:rgba(255,255,255,0.08);border:none;padding:6px 10px;border-radius:6px;width:100%;text-align:left;}
+.niehub-app-scope .switch-btn:hover{background:rgba(255,255,255,0.16);}
+.niehub-app-scope .main{flex:1;min-width:0;}
+.niehub-app-scope .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;}
+.niehub-app-scope .topbar h2{margin:0;font-size:18px;}
+.niehub-app-scope .topbar .sub{color:var(--ink-soft);font-size:12.5px;margin-top:2px;}
+.niehub-app-scope .content{padding:26px 28px 60px;max-width:1180px;}
+.niehub-app-scope /* ---------- Common bits ---------- */
+  .btn{border-radius:8px;border:1px solid var(--border);background:var(--surface);padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink);}
+.niehub-app-scope .btn:hover{border-color:var(--primary);}
+.niehub-app-scope .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+.niehub-app-scope .btn-primary:hover{background:var(--primary-dark);}
+.niehub-app-scope .btn-danger{background:var(--danger-tint);border-color:var(--danger-tint);color:var(--danger);}
+.niehub-app-scope .btn-sm{padding:6px 10px;font-size:12.5px;}
+.niehub-app-scope .row-actions{display:flex;gap:8px;}
+.niehub-app-scope .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px;}
+.niehub-app-scope .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.niehub-app-scope .stat-card .n{font-family:'Manrope';font-size:26px;font-weight:800;color:var(--primary-dark);}
+.niehub-app-scope .stat-card .l{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-top:2px;}
+.niehub-app-scope .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:18px;}
+.niehub-app-scope .card h3{margin:0 0 14px;font-size:14.5px;}
+.niehub-app-scope .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.niehub-app-scope .card-head h3{margin:0;}
+.niehub-app-scope table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.niehub-app-scope th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);padding:8px 10px;border-bottom:1px solid var(--border);}
+.niehub-app-scope td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.niehub-app-scope tr:last-child td{border-bottom:none;}
+.niehub-app-scope .empty-row{padding:30px 10px;text-align:center;color:var(--ink-soft);font-size:13px;}
+.niehub-app-scope .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.niehub-app-scope .badge-green{background:var(--primary-tint);color:var(--primary-dark);}
+.niehub-app-scope .badge-amber{background:var(--amber-tint);color:#8A5A10;}
+.niehub-app-scope .badge-grey{background:#EDEEEA;color:#6B7268;}
+.niehub-app-scope .badge-red{background:var(--danger-tint);color:var(--danger);}
+.niehub-app-scope .growth-track{display:flex;gap:3px;width:46px;}
+.niehub-app-scope .growth-track span{flex:1;height:5px;border-radius:3px;background:#E3E7DF;}
+.niehub-app-scope .growth-track.s1 span:nth-child(1){background:var(--amber);}
+.niehub-app-scope .growth-track.s2 span:nth-child(1), .niehub-app-scope .growth-track.s2 span:nth-child(2){background:var(--primary);}
+.niehub-app-scope .growth-track.s3 span{background:var(--primary-dark);}
+.niehub-app-scope .growth-track.s0 span{background:#D8D1CB;}
+.niehub-app-scope .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.niehub-app-scope .tab{padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);border-bottom:2px solid transparent;cursor:pointer;}
+.niehub-app-scope .tab.active{color:var(--primary-dark);border-color:var(--primary);}
+.niehub-app-scope .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.niehub-app-scope .form-group{margin-bottom:2px;}
+.niehub-app-scope .form-group.full{grid-column:1/-1;}
+.niehub-app-scope .form-group label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px;}
+.niehub-app-scope .form-group input, .niehub-app-scope .form-group select, .niehub-app-scope .form-group textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;background:#fff;color:var(--ink);}
+.niehub-app-scope .form-group input:focus, .niehub-app-scope .form-group select:focus, .niehub-app-scope .form-group textarea:focus{outline:2px solid var(--primary);outline-offset:0;border-color:var(--primary);}
+.niehub-app-scope .checklist{border:1px solid var(--border);border-radius:8px;padding:10px 12px;max-height:200px;overflow-y:auto;}
+.niehub-app-scope .checklist label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:5px 2px;color:var(--ink);}
+.niehub-app-scope .checklist .parish-sub{margin-left:22px;padding-left:10px;border-left:2px solid var(--border);margin-bottom:6px;}
+.niehub-app-scope .benefit-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+.niehub-app-scope .benefit-row:last-child{border-bottom:none;}
+.niehub-app-scope .benefit-name{font-weight:600;font-size:13.5px;}
+.niehub-app-scope .benefit-name small{display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px;margin-top:2px;}
+.niehub-app-scope .toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
+.niehub-app-scope .toggle input{opacity:0;width:0;height:0;}
+.niehub-app-scope .toggle .track{position:absolute;inset:0;background:#D8DDD3;border-radius:20px;transition:.15s;}
+.niehub-app-scope .toggle .track:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
+.niehub-app-scope .toggle input:checked + .track{background:var(--primary);}
+.niehub-app-scope .toggle input:checked + .track:before{transform:translateX(16px);}
+.niehub-app-scope .benefit-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.niehub-app-scope .benefit-card{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+.niehub-app-scope .benefit-card.off{opacity:.45;}
+.niehub-app-scope .benefit-card .amt{font-family:'Manrope';font-size:20px;font-weight:800;color:var(--primary-dark);margin-top:6px;}
+.niehub-app-scope .benefit-card .tag{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.niehub-app-scope .empty-state{text-align:center;padding:50px 20px;color:var(--ink-soft);}
+.niehub-app-scope .empty-state .em-title{font-weight:700;color:var(--ink);margin-bottom:4px;font-size:14.5px;}
+.niehub-app-scope /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,28,22,0.45);align-items:center;justify-content:center;z-index:50;padding:20px;}
+.niehub-app-scope .modal-overlay.open{display:flex;}
+.niehub-app-scope .modal{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 26px 22px;}
+.niehub-app-scope .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.niehub-app-scope .modal-head h3{margin:0;font-size:16.5px;}
+.niehub-app-scope .modal-close{background:none;border:none;font-size:20px;color:var(--ink-soft);line-height:1;}
+.niehub-app-scope .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+.niehub-app-scope .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.niehub-app-scope .search-bar input, .niehub-app-scope .search-bar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#fff;}
+.niehub-app-scope .search-bar input{flex:1;min-width:180px;}
+.niehub-app-scope .msg-item{padding:14px 0;border-bottom:1px solid var(--border);}
+.niehub-app-scope .msg-item:last-child{border-bottom:none;}
+.niehub-app-scope .msg-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:3px;}
+.niehub-app-scope .msg-subject{font-weight:700;font-size:13.5px;margin-bottom:3px;}
+.niehub-app-scope .msg-body{font-size:13px;color:var(--ink);line-height:1.5;}
+.niehub-app-scope .msg-unread .msg-subject:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:6px;}
+.niehub-app-scope .toast{position:fixed;bottom:22px;right:22px;background:var(--primary-dark);color:#fff;padding:12px 18px;border-radius:8px;font-size:13.5px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:99;display:none;}
+
+
+  
+@media (max-width:820px){
+.niehub-app-scope #app-shell{flex-direction:column;}
+.niehub-app-scope .sidebar{width:100%;height:auto;position:relative;min-height:auto;display:flex;flex-wrap:wrap;gap:4px;padding:14px;}
+.niehub-app-scope .sidebar .brand{width:100%;padding-bottom:10px;}
+.niehub-app-scope .sidebar-footer{width:100%;}
+.niehub-app-scope .form-grid{grid-template-columns:1fr;}
+.niehub-app-scope .content{padding:18px;}
+
+  
+}
+
+
+</style>
+<div class="niehub-app-scope">
+
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login-screen">
+  <div class="login-card" id="login-card-inner">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app-shell" style="display:flex;">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h2 id="topbar-title">Dashboard</h2>
+        <div class="sub" id="topbar-sub"></div>
+      </div>
+      <div id="topbar-right"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   NIEHUB AGRI ACADEMY — data management app
+   Data persists via window.storage (shared across all users)
+   ============================================================ */
+
+const FIELDS = ["Eucalyptus Cloning","Fruits Grafting","Pine Propagation","Others"];
+const DEFAULT_DISTRICTS = ["Kampala","Wakiso","Mukono","Jinja","Mbale","Mbarara","Gulu","Lira","Arua","Masaka","Fort Portal","Hoima","Soroti","Kabale","Kasese","Luwero","Iganga","Kabarole","Rukungiri","Kitgum"];
+
+let DB = { niehubers:[], niehubees:[], districts:[], parishes:[], payments:[], messages:[], otherPayees:[] };
+let session = { role:null, trainerId:null }; // role: 'org' | 'trainer'
+let pick = { districtIds:[], parishIds:[] }; // temp state for the assign-locations picker
+let editingTrainerId = null;
+let editingTraineeId = null;
+
+function uid(p){ return (p||'id')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+// Uses the Claude artifact storage API when available (live preview inside Claude).
+// Falls back to browser localStorage automatically once this file is deployed
+// on its own — e.g. uploaded to WordPress — where window.storage does not exist.
+const HAS_ARTIFACT_STORAGE = (typeof window!=='undefined' && window.storage && typeof window.storage.get==='function');
+
+async function sGet(key, shared){
+  if(HAS_ARTIFACT_STORAGE){
+    try{
+      const r = await window.storage.get(key, shared);
+      return r ? JSON.parse(r.value) : null;
+    }catch(e){ return null; }
+  }
+  try{
+    const raw = localStorage.getItem('niehub__'+key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+async function sSet(key, value, shared){
+  if(HAS_ARTIFACT_STORAGE){
+    try{ await window.storage.set(key, JSON.stringify(value), shared); return; }
+    catch(e){ console.error('storage set failed', key, e); }
+  }
+  try{ localStorage.setItem('niehub__'+key, JSON.stringify(value)); }
+  catch(e){ console.error('local storage set failed', key, e); }
+}
+
+async function persist(key){ await sSet(key, DB[key], true); }
+async function persistSession(){ await sSet('session', session, false); }
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ t.style.display='none'; }, 2600);
+}
+
+/* ---------------- Boot ---------------- */
+async function boot(){
+  const loaded = await Promise.all([
+    sGet('niehubers', true), sGet('niehubees', true), sGet('districts', true),
+    sGet('parishes', true), sGet('payments', true), sGet('messages', true), sGet('session', false),
+    sGet('otherPayees', true)
+  ]);
+  DB.niehubers = loaded[0] || [];
+  DB.niehubees = loaded[1] || [];
+  DB.districts = loaded[2] || DEFAULT_DISTRICTS.map(name=>({id:uid('dist'), name}));
+  DB.parishes  = loaded[3] || [];
+  DB.payments  = loaded[4] || [];
+  DB.messages  = loaded[5] || [];
+  DB.otherPayees = loaded[7] || [];
+  if(!loaded[2]) await persist('districts');
+
+  const savedSession = loaded[6];
+  if(savedSession && savedSession.role==='org'){
+    session = savedSession; showApp();
+  } else if(savedSession && savedSession.role==='trainer' && DB.niehubers.find(t=>t.id===savedSession.trainerId)){
+    session = savedSession; showApp();
+  } else {
+    renderLogin('choose');
+  }
+}
+boot();
+
+/* ---------------- Login screens ---------------- */
+function renderLogin(mode){
+  const box = document.getElementById('login-card-inner');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-shell').style.display='none';
+
+  if(mode==='choose'){
+    box.innerHTML = `
+      <div class="login-mark">NA</div>
+      <h1>NIEHUB AGRI ACADEMY</h1>
+      <p class="sub">Tree nursery operator training — data management</p>
+      <div class="role-btn" onclick="renderLogin('org')"><span class="dot"></span> Continue as Organization</div>
+      <div class="role-btn" onclick="renderLogin('trainer')"><span class="dot"></span> Continue as a NIEHUBer (Trainer)</div>
+    `;
+  } else if(mode==='org'){
+    box.innerHTML = `
+      <button class="login-back" onclick="renderLogin('choose')">&larr; Back</button>
+      <h1>Organization Login</h1>
+      <p class="sub">Manage NIEHUBers, districts, trainees, salary and correspondence.</p>
+      <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="loginAsOrg()">Enter Organization Dashboard</button>
+    `;
+  } else if(mode==='trainer'){
+    const opts = DB.niehubers.map(t=>`<option value="${t.id}">${t.name}${t.status==='inactive'?' (inactive)':''}</option>`).join('');
+    box.innerHTML = `
+      <button class="login-back" onclick="renderLogin('choose')">&larr; Back</button>
+      <h1>NIEHUBer Login</h1>
+      <p class="sub">Select your name to open your dashboard.</p>
+      ${DB.niehubers.length ? `
+        <label class="field-label">Your name</label>
+        <select id="trainer-login-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;font-size:14px;">${opts}</select>
+        <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="loginAsTrainer()">Open My Dashboard</button>
+      ` : `<div class="empty-state" style="padding:20px 0;"><div class="em-title">No NIEHUBers registered yet</div>Ask the organization to register you first.</div>`}
+    `;
+  }
+}
+function loginAsOrg(){ session = {role:'org', trainerId:null}; persistSession(); showApp(); }
+function loginAsTrainer(){
+  const id = document.getElementById('trainer-login-select').value;
+  session = {role:'trainer', trainerId:id}; persistSession(); showApp();
+}
+function logout(){ session = {role:null, trainerId:null}; sSet('session', session, false); renderLogin('choose'); }
+
+/* ---------------- App shell ---------------- */
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-shell').style.display='flex';
+  renderSidebar();
+  navigate(session.role==='org' ? 'org-dashboard' : 'trainer-dashboard');
+}
+
+function currentTrainer(){ return DB.niehubers.find(t=>t.id===session.trainerId); }
+
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  if(session.role==='org'){
+    sb.innerHTML = `
+      <div class="brand">NIEHUB AGRI ACADEMY<small>Organization</small></div>
+      <div class="nav-item" data-v="org-dashboard" onclick="navigate('org-dashboard')">Dashboard</div>
+      <div class="nav-section-label">People</div>
+      <div class="nav-item" data-v="org-trainers" onclick="navigate('org-trainers')">NIEHUBers</div>
+      <div class="nav-item" data-v="org-trainees" onclick="navigate('org-trainees')">NIEHUBees</div>
+      <div class="nav-section-label">Setup</div>
+      <div class="nav-item" data-v="org-locations" onclick="navigate('org-locations')">Districts &amp; Parishes</div>
+      <div class="nav-section-label">Finance</div>
+      <div class="nav-item" data-v="org-payments" onclick="navigate('org-payments')">Salary &amp; Payments</div>
+      <div class="nav-section-label">Communication</div>
+      <div class="nav-item" data-v="org-correspondence" onclick="navigate('org-correspondence')">Correspondence</div>
+      <div class="sidebar-footer">
+        <div class="who">Organization</div>
+        <div class="who-role">Admin access</div>
+        <button class="switch-btn" onclick="logout()">Switch account</button>
+      </div>
+    `;
+  } else {
+    const t = currentTrainer();
+    sb.innerHTML = `
+      <div class="brand">NIEHUB AGRI ACADEMY<small>NIEHUBer</small></div>
+      <div class="nav-item" data-v="trainer-dashboard" onclick="navigate('trainer-dashboard')">Dashboard</div>
+      <div class="nav-item" data-v="trainer-trainees" onclick="navigate('trainer-trainees')">My NIEHUBees</div>
+      <div class="nav-item" data-v="trainer-payments" onclick="navigate('trainer-payments')">My Salary</div>
+      <div class="nav-item" data-v="trainer-correspondence" onclick="navigate('trainer-correspondence')">Correspondence</div>
+      <div class="sidebar-footer">
+        <div class="who">${t?t.name:'Trainer'}</div>
+        <div class="who-role">NIEHUBer</div>
+        <button class="switch-btn" onclick="logout()">Switch account</button>
+      </div>
+    `;
+  }
+}
+
+const VIEW_META = {
+  'org-dashboard': ['Organization Dashboard','Overview of the academy'],
+  'org-trainers': ['NIEHUBers','Trainers, duty stations & assignments'],
+  'org-trainees': ['NIEHUBees','All registered trainees'],
+  'org-locations': ['Districts & Parishes','Duty stations used across the academy'],
+  'org-payments': ['Salary & Payments','Manage NIEHUBer pay and benefits'],
+  'org-correspondence': ['Correspondence','Messages & announcements'],
+  'trainer-dashboard': ['My Dashboard','Your training activity'],
+  'trainer-trainees': ['My NIEHUBees','Trainees you have registered'],
+  'trainer-payments': ['My Salary','Pay, allowances & history'],
+  'trainer-correspondence': ['Correspondence','Messages with the organization'],
+};
+
+function navigate(view){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.v===view));
+  const meta = VIEW_META[view];
+  document.getElementById('topbar-title').textContent = meta[0];
+  document.getElementById('topbar-sub').textContent = meta[1];
+  document.getElementById('topbar-right').innerHTML = '';
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  ({
+    'org-dashboard': renderOrgDashboard,
+    'org-trainers': renderOrgTrainers,
+    'org-trainees': renderOrgTrainees,
+    'org-locations': renderOrgLocations,
+    'org-payments': renderOrgPayments,
+    'org-correspondence': renderOrgCorrespondence,
+    'trainer-dashboard': renderTrainerDashboard,
+    'trainer-trainees': renderTrainerTrainees,
+    'trainer-payments': renderTrainerPayments,
+    'trainer-correspondence': renderTrainerCorrespondence,
+  })[view]();
+}
+
+/* ---------------- Modal helpers ---------------- */
+function openModal(title, bodyHtml){
+  document.getElementById('modal-box').innerHTML = `
+    <div class="modal-head"><h3>${title}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    ${bodyHtml}
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+
+/* ================= ORG DASHBOARD ================= */
+function renderOrgDashboard(){
+  const c = document.getElementById('content');
+  const districtsUsed = new Set(DB.niehubers.flatMap(t=>t.districtIds||[])).size;
+  const parishesUsed = new Set(DB.niehubers.flatMap(t=>t.parishIds||[])).size;
+  const fieldCounts = FIELDS.map(f=>({f, n: DB.niehubees.filter(x=>x.fieldOfStudy===f).length}));
+  const maxN = Math.max(1, ...fieldCounts.map(x=>x.n));
+  const recentTrainees = [...DB.niehubees].sort((a,b)=>b.enrollmentDate.localeCompare(a.enrollmentDate)).slice(0,5);
+
+  c.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="n">${DB.niehubers.length}</div><div class="l">Registered NIEHUBers</div></div>
+      <div class="stat-card"><div class="n">${DB.niehubees.length}</div><div class="l">Registered NIEHUBees</div></div>
+      <div class="stat-card"><div class="n">${districtsUsed}</div><div class="l">Districts covered</div></div>
+      <div class="stat-card"><div class="n">${parishesUsed}</div><div class="l">Parishes covered</div></div>
+    </div>
+
+    <div class="card">
+      <h3>NIEHUBees by field of study</h3>
+      ${fieldCounts.map(x=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:140px;font-size:13px;font-weight:600;">${x.f}</div>
+          <div style="flex:1;background:var(--surface-alt);border-radius:6px;height:10px;overflow:hidden;">
+            <div style="width:${(x.n/maxN*100)||0}%;background:var(--primary);height:100%;"></div>
+          </div>
+          <div style="width:26px;text-align:right;font-size:13px;font-weight:700;">${x.n}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Recently enrolled NIEHUBees</h3><button class="btn btn-sm" onclick="navigate('org-trainees')">View all</button></div>
+      ${recentTrainees.length ? `
+      <table><thead><tr><th>Name</th><th>Field</th><th>Trainer</th><th>District</th><th>Status</th></tr></thead>
+      <tbody>${recentTrainees.map(t=>traineeRow(t)).join('')}</tbody></table>
+      ` : emptyState('No NIEHUBees yet','Trainers can register NIEHUBees from their dashboard.')}
+    </div>
+  `;
+}
+
+function emptyState(title, sub){
+  return `<div class="empty-state"><div class="em-title">${title}</div>${sub}</div>`;
+}
+
+function traineeRow(t){
+  const trainer = DB.niehubers.find(x=>x.id===t.trainerId);
+  const d = DB.districts.find(x=>x.id===t.districtId);
+  return `<tr>
+    <td>${t.name}</td>
+    <td>${t.fieldOfStudy}</td>
+    <td>${trainer?trainer.name:'—'}</td>
+    <td>${d?d.name:'—'}</td>
+    <td>${statusBadge(t.status)}</td>
+  </tr>`;
+}
+
+function statusBadge(status){
+  const map = {'Enrolled':'badge-amber','In Training':'badge-green','Graduated':'badge-green','Dropped':'badge-red'};
+  return `<span class="badge ${map[status]||'badge-grey'}">${status}</span>`;
+}
+
+/* ================= ORG: NIEHUBers ================= */
+function renderOrgTrainers(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head" style="margin-bottom:14px;">
+      <div class="search-bar" style="margin:0;flex:1;">
+        <input type="text" id="trainer-search" placeholder="Search NIEHUBers by name or phone" oninput="renderTrainerTable()">
+        <select id="trainer-field-filter" onchange="renderTrainerTable()">
+          <option value="">All fields</option>
+          ${FIELDS.map(f=>`<option value="${f}">${f}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="openTrainerForm()">+ Register NIEHUBer</button>
+    </div>
+    <div class="card"><div id="trainer-table-wrap"></div></div>
+  `;
+  renderTrainerTable();
+}
+
+function renderTrainerTable(){
+  const q = (document.getElementById('trainer-search')?.value || '').toLowerCase();
+  const ff = document.getElementById('trainer-field-filter')?.value || '';
+  let list = DB.niehubers.filter(t =>
+    (t.name.toLowerCase().includes(q) || (t.phone||'').includes(q)) &&
+    (!ff || (t.fieldsOfStudy||[]).includes(ff))
+  );
+  document.getElementById('trainer-table-wrap').innerHTML = list.length ? `
+    <table><thead><tr><th>Name</th><th>Phone</th><th>Fields</th><th>Districts</th><th>Status</th><th></th></tr></thead>
+    <tbody>${list.map(t=>{
+      const dists = (t.districtIds||[]).map(id=>DB.districts.find(d=>d.id===id)?.name).filter(Boolean).join(', ') || '—';
+      return `<tr>
+        <td><strong>${t.name}</strong></td>
+        <td>${t.phone||'—'}</td>
+        <td>${(t.fieldsOfStudy||[]).join(', ')||'—'}</td>
+        <td>${dists}</td>
+        <td>${t.status==='active'?'<span class="badge badge-green">Active</span>':'<span class="badge badge-grey">Inactive</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openTrainerForm('${t.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="toggleTrainerStatus('${t.id}')">${t.status==='active'?'Deactivate':'Activate'}</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : `<div class="empty-row">${emptyState('No NIEHUBers found','Try a different search or register a new one.')}</div>`;
+}
+
+function toggleTrainerStatus(id){
+  const t = DB.niehubers.find(x=>x.id===id);
+  t.status = t.status==='active' ? 'inactive' : 'active';
+  persist('niehubers'); renderTrainerTable(); toast(`${t.name} marked ${t.status}`);
+}
+
+function openTrainerForm(id){
+  editingTrainerId = id || null;
+  const t = id ? DB.niehubers.find(x=>x.id===id) : null;
+  pick.districtIds = t ? [...(t.districtIds||[])] : [];
+  pick.parishIds = t ? [...(t.parishIds||[])] : [];
+
+  openModal(id ? 'Edit NIEHUBer' : 'Register NIEHUBer', `
+    <form onsubmit="return saveTrainer(event)">
+      <div class="form-grid">
+        <div class="form-group full"><label>Full name</label><input required id="tf-name" value="${t?t.name:''}"></div>
+        <div class="form-group"><label>Phone number</label><input required id="tf-phone" value="${t?t.phone||'':''}"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="tf-email" value="${t?t.email||'':''}"></div>
+        <div class="form-group"><label>Gender</label>
+          <select id="tf-gender"><option ${t?.gender==='Male'?'selected':''}>Male</option><option ${t?.gender==='Female'?'selected':''}>Female</option></select>
+        </div>
+        <div class="form-group"><label>Base salary (UGX / month)</label><input type="number" min="0" id="tf-salary" value="${t?t.baseSalary||0:0}"></div>
+        <div class="form-group full">
+          <label>Fields of study taught</label>
+          <div class="checklist">
+            ${FIELDS.map(f=>`<label><input type="checkbox" value="${f}" class="tf-field" ${t && (t.fieldsOfStudy||[]).includes(f)?'checked':''}> ${f}</label>`).join('')}
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Duty stations — districts &amp; parishes</label>
+          <div class="checklist" id="tf-location-picker">${renderLocationPicker()}</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">${id?'Save changes':'Register NIEHUBer'}</button>
+      </div>
+    </form>
+  `);
+}
+
+function renderLocationPicker(){
+  return DB.districts.map(d=>{
+    const checked = pick.districtIds.includes(d.id);
+    const parishes = DB.parishes.filter(p=>p.districtId===d.id);
+    return `
+      <label><input type="checkbox" onchange="pickDistrict('${d.id}', this.checked)" ${checked?'checked':''}> ${d.name}</label>
+      ${checked && parishes.length ? `<div class="parish-sub">${parishes.map(p=>`
+        <label><input type="checkbox" onchange="pickParish('${p.id}', this.checked)" ${pick.parishIds.includes(p.id)?'checked':''}> ${p.name}</label>
+      `).join('')}</div>` : ''}
+    `;
+  }).join('') || '<div style="font-size:13px;color:var(--ink-soft);">No districts yet — add some under Districts &amp; Parishes.</div>';
+}
+function pickDistrict(id, checked){
+  if(checked){ if(!pick.districtIds.includes(id)) pick.districtIds.push(id); }
+  else { pick.districtIds = pick.districtIds.filter(x=>x!==id); pick.parishIds = pick.parishIds.filter(pid => DB.parishes.find(p=>p.id===pid)?.districtId !== id); }
+  document.getElementById('tf-location-picker').innerHTML = renderLocationPicker();
+}
+function pickParish(id, checked){
+  if(checked){ if(!pick.parishIds.includes(id)) pick.parishIds.push(id); }
+  else{ pick.parishIds = pick.parishIds.filter(x=>x!==id); }
+}
+
+function saveTrainer(e){
+  e.preventDefault();
+  const fields = [...document.querySelectorAll('.tf-field:checked')].map(x=>x.value);
+  const data = {
+    name: document.getElementById('tf-name').value.trim(),
+    phone: document.getElementById('tf-phone').value.trim(),
+    email: document.getElementById('tf-email').value.trim(),
+    gender: document.getElementById('tf-gender').value,
+    baseSalary: Number(document.getElementById('tf-salary').value)||0,
+    fieldsOfStudy: fields,
+    districtIds: [...pick.districtIds],
+    parishIds: [...pick.parishIds],
+  };
+  if(editingTrainerId){
+    const t = DB.niehubers.find(x=>x.id===editingTrainerId);
+    Object.assign(t, data);
+    toast('NIEHUBer updated');
+  } else {
+    DB.niehubers.push({
+      id: uid('tr'), ...data, status:'active', dateJoined: new Date().toISOString().slice(0,10),
+      momoNumber:'', momoName:'',
+      benefits: { trainingAllowance:{on:false,amount:0}, airtime:{on:false,amount:0}, dataBundle:{on:false,amount:0} }
+    });
+    toast('NIEHUBer registered');
+  }
+  persist('niehubers');
+  closeModal();
+  renderTrainerTable();
+  return false;
+}
+
+/* ================= ORG: Districts & Parishes ================= */
+function renderOrgLocations(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Districts</h3><button class="btn btn-primary btn-sm" onclick="openDistrictForm()">+ Add district</button></div>
+    <div class="card" id="districts-wrap"></div>
+  `;
+  renderDistrictsWrap();
+}
+function renderDistrictsWrap(){
+  const wrap = document.getElementById('districts-wrap');
+  wrap.innerHTML = DB.districts.length ? DB.districts.map(d=>{
+    const parishes = DB.parishes.filter(p=>p.districtId===d.id);
+    const trainerCount = DB.niehubers.filter(t=>(t.districtIds||[]).includes(d.id)).length;
+    return `
+      <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><strong>${d.name}</strong> <span style="color:var(--ink-soft);font-size:12.5px;"> · ${parishes.length} parishes · ${trainerCount} NIEHUBers</span></div>
+          <button class="btn btn-sm" onclick="openParishForm('${d.id}')">+ Add parish</button>
+        </div>
+        ${parishes.length ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${parishes.map(p=>`<span class="badge badge-grey">${p.name}</span>`).join('')}</div>` : ''}
+      </div>
+    `;
+  }).join('') : emptyState('No districts yet','Add your first district to get started.');
+}
+function openDistrictForm(){
+  openModal('Add District', `
+    <form onsubmit="return saveDistrict(event)">
+      <div class="form-group full"><label>District name</label><input required id="df-name"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Add district</button></div>
+    </form>
+  `);
+}
+function saveDistrict(e){
+  e.preventDefault();
+  const name = document.getElementById('df-name').value.trim();
+  if(name){ DB.districts.push({id:uid('dist'), name}); persist('districts'); toast('District added'); }
+  closeModal(); renderDistrictsWrap();
+  return false;
+}
+function openParishForm(districtId){
+  const d = DB.districts.find(x=>x.id===districtId);
+  openModal(`Add Parish — ${d.name}`, `
+    <form onsubmit="return saveParish(event,'${districtId}')">
+      <div class="form-group full"><label>Parish name</label><input required id="pf-name"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Add parish</button></div>
+    </form>
+  `);
+}
+function saveParish(e, districtId){
+  e.preventDefault();
+  const name = document.getElementById('pf-name').value.trim();
+  if(name){ DB.parishes.push({id:uid('par'), name, districtId}); persist('parishes'); toast('Parish added'); }
+  closeModal(); renderDistrictsWrap();
+  return false;
+}
+
+/* ================= ORG: NIEHUBees ================= */
+function renderOrgTrainees(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head" style="margin-bottom:14px;">
+      <div class="search-bar" style="margin:0;flex:1;">
+        <input type="text" id="tn-search" placeholder="Search by name or phone" oninput="renderTraineeTable()">
+        <select id="tn-field" onchange="renderTraineeTable()"><option value="">All fields</option>${FIELDS.map(f=>`<option>${f}</option>`).join('')}</select>
+        <select id="tn-status" onchange="renderTraineeTable()"><option value="">All statuses</option><option>Enrolled</option><option>In Training</option><option>Graduated</option><option>Dropped</option></select>
+        <select id="tn-trainer" onchange="renderTraineeTable()"><option value="">All NIEHUBers</option>${DB.niehubers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select>
+      </div>
+      <button class="btn btn-primary" onclick="openTraineeForm(null,true)">+ Register NIEHUBee</button>
+    </div>
+    <div class="card"><div id="trainee-table-wrap"></div></div>
+  `;
+  renderTraineeTable();
+}
+function renderTraineeTable(){
+  const q = (document.getElementById('tn-search')?.value||'').toLowerCase();
+  const field = document.getElementById('tn-field')?.value||'';
+  const status = document.getElementById('tn-status')?.value||'';
+  const trainerId = document.getElementById('tn-trainer')?.value||'';
+  let list = DB.niehubees.filter(t =>
+    (t.name.toLowerCase().includes(q) || (t.phone||'').includes(q)) &&
+    (!field || t.fieldOfStudy===field) && (!status || t.status===status) && (!trainerId || t.trainerId===trainerId)
+  );
+  document.getElementById('trainee-table-wrap').innerHTML = list.length ? `
+    <table><thead><tr><th>Name</th><th>Field</th><th>Trainer</th><th>District / Parish</th><th>Progress</th><th>Status</th><th></th></tr></thead>
+    <tbody>${list.map(t=>{
+      const trainer = DB.niehubers.find(x=>x.id===t.trainerId);
+      const d = DB.districts.find(x=>x.id===t.districtId);
+      const p = DB.parishes.find(x=>x.id===t.parishId);
+      return `<tr>
+        <td>${t.name}</td>
+        <td>${t.fieldOfStudy}</td>
+        <td>${trainer?trainer.name:'Unassigned'}</td>
+        <td>${d?d.name:'—'}${p?', '+p.name:''}</td>
+        <td>${growthBar(t.status)}</td>
+        <td>${statusBadge(t.status)}</td>
+        <td class="row-actions">
+          <select onchange="changeTraineeStatus('${t.id}', this.value)" class="btn-sm" style="border:1px solid var(--border);border-radius:6px;">
+            ${['Enrolled','In Training','Graduated','Dropped'].map(s=>`<option value="${s}" ${t.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm" onclick="openTraineeForm('${t.id}',true)">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteTrainee('${t.id}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : `<div class="empty-row">${emptyState('No NIEHUBees found','Adjust filters, or register a NIEHUBee directly.')}</div>`;
+}
+function deleteTrainee(id){
+  const t = DB.niehubees.find(x=>x.id===id);
+  if(!confirm(`Remove ${t.name} from NIEHUBees? This cannot be undone.`)) return;
+  DB.niehubees = DB.niehubees.filter(x=>x.id!==id);
+  persist('niehubees'); renderTraineeTable(); toast('NIEHUBee removed');
+}
+function growthBar(status){
+  const cls = {'Enrolled':'s1','In Training':'s2','Graduated':'s3','Dropped':'s0'}[status]||'s0';
+  return `<div class="growth-track ${cls}"><span></span><span></span><span></span></div>`;
+}
+function changeTraineeStatus(id, value){
+  const t = DB.niehubees.find(x=>x.id===id); t.status = value; persist('niehubees'); renderTraineeTable(); toast('Status updated');
+}
+
+/* ================= ORG: Payments (full finance access — NIEHUBers + Other team members) ================= */
+function renderOrgPayments(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="tabs">
+      <div class="tab active" id="tab-benefits" onclick="switchPayTab('benefits')">NIEHUBer Pay & Benefits</div>
+      <div class="tab" id="tab-others" onclick="switchPayTab('others')">Other Team Members</div>
+      <div class="tab" id="tab-history" onclick="switchPayTab('history')">Payment History</div>
+    </div>
+    <div id="pay-tab-content"></div>
+  `;
+  switchPayTab('benefits');
+}
+function switchPayTab(tab){
+  document.getElementById('tab-benefits').classList.toggle('active', tab==='benefits');
+  document.getElementById('tab-others').classList.toggle('active', tab==='others');
+  document.getElementById('tab-history').classList.toggle('active', tab==='history');
+  const wrap = document.getElementById('pay-tab-content');
+  if(tab==='benefits'){
+    wrap.innerHTML = `<div class="card"><div id="benefits-table-wrap"></div></div>`;
+    renderBenefitsTable();
+  } else if(tab==='others'){
+    wrap.innerHTML = `
+      <div class="card-head"><h3 style="margin:0;">Other team members</h3><button class="btn btn-primary btn-sm" onclick="openOtherPayeeForm()">+ Add team member</button></div>
+      <div class="card"><div id="others-table-wrap"></div></div>
+    `;
+    renderOtherPayeesTable();
+  } else {
+    const rows = [...DB.payments].sort((a,b)=>b.date.localeCompare(a.date));
+    wrap.innerHTML = `<div class="card">${rows.length ? `
+      <table><thead><tr><th>Date</th><th>Recipient</th><th>Role</th><th>Type</th><th>Amount (UGX)</th><th>Status</th></tr></thead>
+      <tbody>${rows.map(p=>{
+        const label = payeeLabel(p.payeeType, p.payeeId);
+        return `<tr><td>${p.date}</td><td>${label.name}</td><td>${label.role}</td><td>${p.type}</td><td>${p.amount.toLocaleString()}</td><td>${p.status==='Paid'?'<span class="badge badge-green">Paid</span>':'<span class="badge badge-amber">Pending</span>'}</td></tr>`;
+      }).join('')}</tbody></table>` : emptyState('No payment records yet','Record a payment from the Pay & Benefits tabs.')}</div>`;
+  }
+}
+function payeeLabel(payeeType, payeeId){
+  if(payeeType==='other'){
+    const o = DB.otherPayees.find(x=>x.id===payeeId);
+    return { name: o?o.name:'—', role: o?o.role:'Other' };
+  }
+  const t = DB.niehubers.find(x=>x.id===payeeId);
+  return { name: t?t.name:'—', role: 'NIEHUBer' };
+}
+function renderBenefitsTable(){
+  document.getElementById('benefits-table-wrap').innerHTML = DB.niehubers.length ? `
+    <table><thead><tr><th>NIEHUBer</th><th>Base salary</th><th>Training allowance</th><th>Airtime</th><th>Data bundle</th><th>Momo account</th><th></th></tr></thead>
+    <tbody>${DB.niehubers.map(t=>{
+      const b = t.benefits || {trainingAllowance:{on:false,amount:0},airtime:{on:false,amount:0},dataBundle:{on:false,amount:0}};
+      return `<tr>
+        <td><strong>${t.name}</strong></td>
+        <td>${t.baseSalary?t.baseSalary.toLocaleString():'—'}</td>
+        <td>${b.trainingAllowance.on ? 'UGX '+b.trainingAllowance.amount.toLocaleString() : '<span class="badge badge-grey">Off</span>'}</td>
+        <td>${b.airtime.on ? 'UGX '+b.airtime.amount.toLocaleString() : '<span class="badge badge-grey">Off</span>'}</td>
+        <td>${b.dataBundle.on ? 'UGX '+b.dataBundle.amount.toLocaleString() : '<span class="badge badge-grey">Off</span>'}</td>
+        <td>${t.momoNumber ? (t.momoName||'')+' · '+t.momoNumber : '<span class="badge badge-grey">Not set</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openBenefitsForm('${t.id}')">Edit benefits</button>
+          <button class="btn btn-sm" onclick="openMomoFormFor('trainer','${t.id}')">Payment account</button>
+          <button class="btn btn-sm btn-primary" onclick="openRecordPayment('trainer','${t.id}')">Record payment</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : emptyState('No NIEHUBers registered yet','Register NIEHUBers to manage their pay.');
+}
+function openBenefitsForm(trainerId){
+  const t = DB.niehubers.find(x=>x.id===trainerId);
+  const b = t.benefits;
+  openModal(`Benefits — ${t.name}`, `
+    <form onsubmit="return saveBenefits(event,'${trainerId}')">
+      <div class="benefit-row"><div class="benefit-name">Training allowance<small>Paid per training session/cycle</small></div>
+        <label class="toggle"><input type="checkbox" id="b-ta-on" ${b.trainingAllowance.on?'checked':''}><span class="track"></span></label></div>
+      <div class="form-group" style="margin:8px 0 14px;"><label>Amount (UGX)</label><input type="number" min="0" id="b-ta-amt" value="${b.trainingAllowance.amount}"></div>
+      <div class="benefit-row"><div class="benefit-name">Airtime<small>Monthly airtime benefit</small></div>
+        <label class="toggle"><input type="checkbox" id="b-air-on" ${b.airtime.on?'checked':''}><span class="track"></span></label></div>
+      <div class="form-group" style="margin:8px 0 14px;"><label>Amount (UGX)</label><input type="number" min="0" id="b-air-amt" value="${b.airtime.amount}"></div>
+      <div class="benefit-row"><div class="benefit-name">Data bundle<small>Monthly internet data benefit</small></div>
+        <label class="toggle"><input type="checkbox" id="b-data-on" ${b.dataBundle.on?'checked':''}><span class="track"></span></label></div>
+      <div class="form-group" style="margin:8px 0 4px;"><label>Amount (UGX)</label><input type="number" min="0" id="b-data-amt" value="${b.dataBundle.amount}"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save benefits</button></div>
+    </form>
+  `);
+}
+function saveBenefits(e, trainerId){
+  e.preventDefault();
+  const t = DB.niehubers.find(x=>x.id===trainerId);
+  t.benefits = {
+    trainingAllowance:{on:document.getElementById('b-ta-on').checked, amount:Number(document.getElementById('b-ta-amt').value)||0},
+    airtime:{on:document.getElementById('b-air-on').checked, amount:Number(document.getElementById('b-air-amt').value)||0},
+    dataBundle:{on:document.getElementById('b-data-on').checked, amount:Number(document.getElementById('b-data-amt').value)||0},
+  };
+  persist('niehubers'); closeModal(); renderBenefitsTable(); toast('Benefits updated');
+  return false;
+}
+
+/* --- Other team members (finance access for staff outside the NIEHUBer role) --- */
+function renderOtherPayeesTable(){
+  document.getElementById('others-table-wrap').innerHTML = DB.otherPayees.length ? `
+    <table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Momo account</th><th></th></tr></thead>
+    <tbody>${DB.otherPayees.map(o=>`
+      <tr>
+        <td><strong>${o.name}</strong></td>
+        <td>${o.role||'—'}</td>
+        <td>${o.phone||'—'}</td>
+        <td>${o.momoNumber ? (o.momoName||'')+' · '+o.momoNumber : '<span class="badge badge-grey">Not set</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openOtherPayeeForm('${o.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="openMomoFormFor('other','${o.id}')">Payment account</button>
+          <button class="btn btn-sm btn-primary" onclick="openRecordPayment('other','${o.id}')">Record payment</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteOtherPayee('${o.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('')}</tbody></table>
+  ` : emptyState('No other team members yet','Add staff outside the NIEHUBer role — e.g. drivers, admin, field officers — to manage their pay here too.');
+}
+function openOtherPayeeForm(id){
+  const o = id ? DB.otherPayees.find(x=>x.id===id) : null;
+  openModal(id ? 'Edit Team Member' : 'Add Team Member', `
+    <form onsubmit="return saveOtherPayee(event, ${id?`'${id}'`:'null'})">
+      <div class="form-grid">
+        <div class="form-group full"><label>Full name</label><input required id="op-name" value="${o?o.name:''}"></div>
+        <div class="form-group"><label>Role / position</label><input id="op-role" placeholder="e.g. Field Officer, Driver, Admin" value="${o?o.role||'':''}"></div>
+        <div class="form-group"><label>Phone number</label><input id="op-phone" value="${o?o.phone||'':''}"></div>
+        <div class="form-group full"><label>Base salary (UGX / month)</label><input type="number" min="0" id="op-salary" value="${o?o.baseSalary||0:0}"></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">${id?'Save changes':'Add team member'}</button></div>
+    </form>
+  `);
+}
+function saveOtherPayee(e, id){
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('op-name').value.trim(),
+    role: document.getElementById('op-role').value.trim(),
+    phone: document.getElementById('op-phone').value.trim(),
+    baseSalary: Number(document.getElementById('op-salary').value)||0,
+  };
+  if(id){ Object.assign(DB.otherPayees.find(x=>x.id===id), data); toast('Team member updated'); }
+  else { DB.otherPayees.push({ id: uid('op'), ...data, momoNumber:'', momoName:'' }); toast('Team member added'); }
+  persist('otherPayees'); closeModal(); renderOtherPayeesTable();
+  return false;
+}
+function deleteOtherPayee(id){
+  const o = DB.otherPayees.find(x=>x.id===id);
+  if(!confirm(`Remove ${o.name} from team members?`)) return;
+  DB.otherPayees = DB.otherPayees.filter(x=>x.id!==id);
+  persist('otherPayees'); renderOtherPayeesTable(); toast('Team member removed');
+}
+
+/* --- Mobile Money account: organization can set this up for any NIEHUBer or team member --- */
+function openMomoFormFor(payeeType, payeeId){
+  const rec = payeeType==='other' ? DB.otherPayees.find(x=>x.id===payeeId) : DB.niehubers.find(x=>x.id===payeeId);
+  openModal(`Mobile Money Account — ${rec.name}`, `
+    <form onsubmit="return saveMomoFor(event, '${payeeType}', '${payeeId}')">
+      <div class="form-group full"><label>Account name</label><input required id="mm-name" value="${rec.momoName||''}"></div>
+      <div class="form-group full" style="margin-top:12px;"><label>Mobile Money phone number</label><input required id="mm-phone" value="${rec.momoNumber||''}"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save account</button></div>
+    </form>
+  `);
+}
+function saveMomoFor(e, payeeType, payeeId){
+  e.preventDefault();
+  const rec = payeeType==='other' ? DB.otherPayees.find(x=>x.id===payeeId) : DB.niehubers.find(x=>x.id===payeeId);
+  rec.momoName = document.getElementById('mm-name').value.trim();
+  rec.momoNumber = document.getElementById('mm-phone').value.trim();
+  persist(payeeType==='other' ? 'otherPayees' : 'niehubers');
+  closeModal();
+  if(session.role==='trainer') renderTrainerPayments();
+  else if(payeeType==='other') renderOtherPayeesTable();
+  else renderBenefitsTable();
+  toast('Mobile Money account saved');
+  return false;
+}
+
+/* --- Record a payment for a NIEHUBer or another team member --- */
+function openRecordPayment(payeeType, payeeId){
+  const rec = payeeType==='other' ? DB.otherPayees.find(x=>x.id===payeeId) : DB.niehubers.find(x=>x.id===payeeId);
+  openModal(`Record Payment — ${rec.name}`, `
+    <form onsubmit="return savePayment(event,'${payeeType}','${payeeId}')">
+      <div class="form-grid">
+        <div class="form-group full"><label>Type</label>
+          <select id="pf-type"><option>Salary</option><option>Training Allowance</option><option>Airtime</option><option>Data Bundle</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label>Amount (UGX)</label><input type="number" min="0" required id="pf-amount" value="${rec.baseSalary||0}"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="pf-date" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="form-group full"><label>Status</label>
+          <select id="pf-status"><option>Paid</option><option>Pending</option></select>
+        </div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save payment</button></div>
+    </form>
+  `);
+}
+function savePayment(e, payeeType, payeeId){
+  e.preventDefault();
+  DB.payments.push({
+    id: uid('pay'), payeeType, payeeId,
+    type: document.getElementById('pf-type').value,
+    amount: Number(document.getElementById('pf-amount').value)||0,
+    date: document.getElementById('pf-date').value,
+    status: document.getElementById('pf-status').value,
+  });
+  persist('payments'); closeModal(); switchPayTab('history'); toast('Payment recorded');
+  return false;
+}
+
+/* ================= ORG: Correspondence ================= */
+function renderOrgCorrespondence(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Messages</h3><button class="btn btn-primary btn-sm" onclick="openComposeForm('org')">+ New message</button></div>
+    <div class="card" id="msg-wrap"></div>
+  `;
+  renderMessages('org');
+}
+function renderMessages(viewer){
+  const wrap = document.getElementById('msg-wrap');
+  let list;
+  if(viewer==='org') list = DB.messages;
+  else list = DB.messages.filter(m => m.to===viewer || m.to==='ALL' || m.from===viewer);
+  list = [...list].sort((a,b)=>b.date.localeCompare(a.date));
+  wrap.innerHTML = list.length ? list.map(m=>{
+    const fromLabel = m.from==='org' ? 'Organization' : (DB.niehubers.find(t=>t.id===m.from)?.name || 'NIEHUBer');
+    const toLabel = m.to==='org' ? 'Organization' : m.to==='ALL' ? 'All NIEHUBers' : (DB.niehubers.find(t=>t.id===m.to)?.name || 'NIEHUBer');
+    return `<div class="msg-item"><div class="msg-top"><span>${fromLabel} → ${toLabel}</span><span>${m.date}</span></div>
+      <div class="msg-subject">${m.subject}</div><div class="msg-body">${m.body}</div></div>`;
+  }).join('') : emptyState('No messages yet','Send an announcement or message to get started.');
+}
+function openComposeForm(fromRole){
+  const isOrg = fromRole==='org';
+  const toOptions = isOrg
+    ? `<option value="ALL">All NIEHUBers</option>${DB.niehubers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}`
+    : `<option value="org">Organization</option>`;
+  openModal('New Message', `
+    <form onsubmit="return sendMessage(event,'${fromRole}')">
+      <div class="form-grid">
+        <div class="form-group full"><label>To</label><select id="mf-to">${toOptions}</select></div>
+        <div class="form-group full"><label>Subject</label><input required id="mf-subject"></div>
+        <div class="form-group full"><label>Message</label><textarea required id="mf-body" rows="4"></textarea></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Send</button></div>
+    </form>
+  `);
+}
+function sendMessage(e, fromRole){
+  e.preventDefault();
+  const from = fromRole==='org' ? 'org' : session.trainerId;
+  DB.messages.push({
+    id: uid('msg'), from, to: document.getElementById('mf-to').value,
+    subject: document.getElementById('mf-subject').value.trim(),
+    body: document.getElementById('mf-body').value.trim(),
+    date: new Date().toISOString().slice(0,10), read:false
+  });
+  persist('messages'); closeModal();
+  if(fromRole==='org') renderMessages('org'); else renderMessages(session.trainerId);
+  toast('Message sent');
+  return false;
+}
+
+/* ================= TRAINER: Dashboard ================= */
+function renderTrainerDashboard(){
+  const t = currentTrainer();
+  const mine = DB.niehubees.filter(x=>x.trainerId===t.id);
+  const c = document.getElementById('content');
+  const dists = (t.districtIds||[]).map(id=>DB.districts.find(d=>d.id===id)?.name).filter(Boolean);
+  const parishes = (t.parishIds||[]).map(id=>DB.parishes.find(p=>p.id===id)?.name).filter(Boolean);
+  const fieldCounts = FIELDS.map(f=>({f, n: mine.filter(x=>x.fieldOfStudy===f).length}));
+  const maxN = Math.max(1, ...fieldCounts.map(x=>x.n));
+
+  c.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="n">${mine.length}</div><div class="l">My NIEHUBees</div></div>
+      <div class="stat-card"><div class="n">${dists.length}</div><div class="l">Assigned districts</div></div>
+      <div class="stat-card"><div class="n">${parishes.length}</div><div class="l">Assigned parishes</div></div>
+      <div class="stat-card"><div class="n">${DB.payments.filter(p=>p.payeeType==='trainer' && p.payeeId===t.id && p.status==='Pending').length}</div><div class="l">Pending payments</div></div>
+    </div>
+    <div class="card">
+      <h3>My duty stations</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${dists.length ? dists.map(d=>`<span class="badge badge-green">${d}</span>`).join('') : '<span style="color:var(--ink-soft);font-size:13px;">None assigned yet — contact the organization.</span>'}
+        ${parishes.map(p=>`<span class="badge badge-grey">${p}</span>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3>My NIEHUBees by field of study</h3>
+      ${fieldCounts.map(x=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:140px;font-size:13px;font-weight:600;">${x.f}</div>
+          <div style="flex:1;background:var(--surface-alt);border-radius:6px;height:10px;overflow:hidden;"><div style="width:${(x.n/maxN*100)||0}%;background:var(--primary);height:100%;"></div></div>
+          <div style="width:26px;text-align:right;font-size:13px;font-weight:700;">${x.n}</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+/* ================= TRAINER: My NIEHUBees ================= */
+function renderTrainerTrainees(){
+  const t = currentTrainer();
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">My NIEHUBees</h3><button class="btn btn-primary btn-sm" onclick="openTraineeForm(null,false)">+ Register NIEHUBee</button></div>
+    <div class="card"><div id="my-trainee-wrap"></div></div>
+  `;
+  renderMyTraineeTable();
+}
+function renderMyTraineeTable(){
+  const t = currentTrainer();
+  const mine = DB.niehubees.filter(x=>x.trainerId===t.id);
+  document.getElementById('my-trainee-wrap').innerHTML = mine.length ? `
+    <table><thead><tr><th>Name</th><th>Field</th><th>District/Parish</th><th>Progress</th><th>Status</th><th></th></tr></thead>
+    <tbody>${mine.map(x=>{
+      const d = DB.districts.find(dd=>dd.id===x.districtId);
+      const p = DB.parishes.find(pp=>pp.id===x.parishId);
+      return `<tr><td>${x.name}</td><td>${x.fieldOfStudy}</td><td>${d?d.name:'—'}${p?', '+p.name:''}</td><td>${growthBar(x.status)}</td><td>${statusBadge(x.status)}</td>
+        <td class="row-actions"><select onchange="changeTraineeStatus('${x.id}', this.value)" class="btn-sm" style="border:1px solid var(--border);border-radius:6px;">
+          ${['Enrolled','In Training','Graduated','Dropped'].map(s=>`<option value="${s}" ${x.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <button class="btn btn-sm" onclick="openTraineeForm('${x.id}',false)">Edit</button></td></tr>`;
+    }).join('')}</tbody></table>
+  ` : emptyState('No NIEHUBees registered yet','Register a trainee from your area.');
+}
+
+// isOrg=true lets the organization register/edit a NIEHUBee for any NIEHUBer and any district.
+// isOrg=false (trainer) scopes district choices and trainer assignment to the logged-in NIEHUBer.
+function openTraineeForm(id, isOrg){
+  editingTraineeId = id || null;
+  const existing = id ? DB.niehubees.find(x=>x.id===id) : null;
+  const selfTrainer = currentTrainer();
+  const dists = isOrg ? DB.districts : ((selfTrainer && selfTrainer.districtIds && selfTrainer.districtIds.length) ? DB.districts.filter(d=>selfTrainer.districtIds.includes(d.id)) : DB.districts);
+
+  const trainerPicker = isOrg ? `
+    <div class="form-group"><label>Assigned NIEHUBer</label>
+      <select id="nf-trainer">
+        <option value="">Unassigned</option>
+        ${DB.niehubers.map(t=>`<option value="${t.id}" ${existing && existing.trainerId===t.id?'selected':''}>${t.name}</option>`).join('')}
+      </select>
+    </div>` : '';
+
+  openModal(id ? 'Edit NIEHUBee' : 'Register NIEHUBee', `
+    <form onsubmit="return saveTrainee(event, ${isOrg?'true':'false'})">
+      <div class="form-grid">
+        <div class="form-group full"><label>Full name</label><input required id="nf-name" value="${existing?existing.name:''}"></div>
+        <div class="form-group"><label>Phone number</label><input id="nf-phone" value="${existing?existing.phone||'':''}"></div>
+        <div class="form-group"><label>Gender</label><select id="nf-gender"><option ${existing?.gender==='Male'?'selected':''}>Male</option><option ${existing?.gender==='Female'?'selected':''}>Female</option></select></div>
+        <div class="form-group"><label>Age</label><input type="number" min="10" id="nf-age" value="${existing&&existing.age?existing.age:''}"></div>
+        <div class="form-group"><label>Field of study</label><select id="nf-field">${FIELDS.map(f=>`<option ${existing&&existing.fieldOfStudy===f?'selected':''}>${f}</option>`).join('')}</select></div>
+        ${trainerPicker}
+        <div class="form-group"><label>District</label><select id="nf-district" onchange="refreshTraineeParishes()">${dists.map(d=>`<option value="${d.id}" ${existing&&existing.districtId===d.id?'selected':''}>${d.name}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Parish</label><select id="nf-parish"></select></div>
+        <div class="form-group"><label>Enrollment date</label><input type="date" id="nf-date" value="${existing?existing.enrollmentDate:new Date().toISOString().slice(0,10)}"></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">${id?'Save changes':'Register'}</button></div>
+    </form>
+  `);
+  refreshTraineeParishes(existing ? existing.parishId : null);
+}
+function refreshTraineeParishes(preselectParishId){
+  const distId = document.getElementById('nf-district').value;
+  const parishes = DB.parishes.filter(p=>p.districtId===distId);
+  document.getElementById('nf-parish').innerHTML = parishes.length
+    ? parishes.map(p=>`<option value="${p.id}" ${preselectParishId===p.id?'selected':''}>${p.name}</option>`).join('')
+    : `<option value="">—</option>`;
+}
+function saveTrainee(e, isOrg){
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('nf-name').value.trim(),
+    phone: document.getElementById('nf-phone').value.trim(),
+    gender: document.getElementById('nf-gender').value,
+    age: Number(document.getElementById('nf-age').value)||null,
+    fieldOfStudy: document.getElementById('nf-field').value,
+    districtId: document.getElementById('nf-district').value,
+    parishId: document.getElementById('nf-parish').value || null,
+    trainerId: isOrg ? (document.getElementById('nf-trainer').value || null) : currentTrainer().id,
+  };
+  if(editingTraineeId){
+    Object.assign(DB.niehubees.find(x=>x.id===editingTraineeId), data);
+    toast('NIEHUBee updated');
+  } else {
+    DB.niehubees.push({ id: uid('ne'), ...data, enrollmentDate: document.getElementById('nf-date').value, status: 'Enrolled' });
+    toast('NIEHUBee registered');
+  }
+  persist('niehubees'); closeModal();
+  if(isOrg) renderTraineeTable(); else renderMyTraineeTable();
+  return false;
+}
+
+/* ================= TRAINER: My Salary ================= */
+function renderTrainerPayments(){
+  const t = currentTrainer();
+  const b = t.benefits || {trainingAllowance:{on:false,amount:0},airtime:{on:false,amount:0},dataBundle:{on:false,amount:0}};
+  const c = document.getElementById('content');
+  const history = DB.payments.filter(p=>p.payeeType==='trainer' && p.payeeId===t.id).sort((a,b2)=>b2.date.localeCompare(a.date));
+  c.innerHTML = `
+    <div class="card">
+      <div class="card-head"><h3>Mobile Money account</h3><button class="btn btn-sm" onclick="openMomoFormFor('trainer','${t.id}')">${t.momoNumber?'Update':'Add'} account</button></div>
+      ${t.momoNumber ? `<div style="font-size:14px;"><strong>${t.momoName||'—'}</strong> · ${t.momoNumber}</div>` : `<div style="color:var(--ink-soft);font-size:13.5px;">No mobile money account on file yet.</div>`}
+    </div>
+    <div class="card">
+      <h3>Base salary & benefits</h3>
+      <div class="benefit-cards">
+        <div class="benefit-card"><div class="tag">Base salary</div><div class="amt">UGX ${(t.baseSalary||0).toLocaleString()}</div></div>
+        <div class="benefit-card ${b.trainingAllowance.on?'':'off'}"><div class="tag">Training allowance</div><div class="amt">${b.trainingAllowance.on?'UGX '+b.trainingAllowance.amount.toLocaleString():'Not enabled'}</div></div>
+        <div class="benefit-card ${b.airtime.on?'':'off'}"><div class="tag">Airtime</div><div class="amt">${b.airtime.on?'UGX '+b.airtime.amount.toLocaleString():'Not enabled'}</div></div>
+        <div class="benefit-card ${b.dataBundle.on?'':'off'}"><div class="tag">Data bundle</div><div class="amt">${b.dataBundle.on?'UGX '+b.dataBundle.amount.toLocaleString():'Not enabled'}</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:12px;margin-bottom:0;">Benefit eligibility is configured by the organization.</p>
+    </div>
+    <div class="card">
+      <h3>Payment history</h3>
+      ${history.length ? `<table><thead><tr><th>Date</th><th>Type</th><th>Amount (UGX)</th><th>Status</th></tr></thead>
+      <tbody>${history.map(p=>`<tr><td>${p.date}</td><td>${p.type}</td><td>${p.amount.toLocaleString()}</td><td>${p.status==='Paid'?'<span class="badge badge-green">Paid</span>':'<span class="badge badge-amber">Pending</span>'}</td></tr>`).join('')}</tbody></table>`
+      : emptyState('No payments recorded yet','Your payment history will appear here once the organization records a payment.')}
+    </div>
+  `;
+}
+/* ================= TRAINER: Correspondence ================= */
+function renderTrainerCorrespondence(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Messages</h3><button class="btn btn-primary btn-sm" onclick="openComposeForm('trainer')">+ New message</button></div>
+    <div class="card" id="msg-wrap"></div>
+  `;
+  renderMessages(session.trainerId);
+}
+</script>
+
+</div>
