@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIEHUB AGRI ACADEMY</title>
+<!-- Installable app (PWA): manifest.json, sw.js and the icon-*.png files must be
+     uploaded to GitHub Pages alongside this HTML file, in the same folder, for
+     "Install app" to work. See the setup notes sent with this file. -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2F6E4F">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Shared database (Firebase Firestore) — needed so every teammate, on every browser/device, sees the same data. See FIREBASE_CONFIG near the top of the main script block below for setup steps. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- HD certificate image export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Maps (OpenStreetMap via Leaflet — free, no API key required) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --bg:#F5F6F1;
+    --surface:#FFFFFF;
+    --surface-alt:#EDF1E9;
+    --ink:#1E2A22;
+    --ink-soft:#5C6B60;
+    --primary:#2F6E4F;
+    --primary-dark:#20503A;
+    --primary-tint:#E3EEE7;
+    --amber:#D98E2B;
+    --amber-tint:#FBF0DD;
+    --brown:#8B5E34;
+    --danger:#B84C3E;
+    --danger-tint:#F7E7E4;
+    --border:#DDE3D9;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html{overflow-x:hidden;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;}
+  h1,h2,h3,h4,.brand,.nav-label{font-family:'Manrope',sans-serif;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  a{color:inherit;}
+
+  /* ---------- Login ---------- */
+  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;max-width:420px;width:100%;box-shadow:0 2px 24px rgba(30,42,34,0.06);}
+  .login-mark{width:44px;height:44px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Manrope';margin-bottom:18px;}
+  .login-card h1{font-size:22px;margin:0 0 4px;}
+  .login-card p.sub{color:var(--ink-soft);margin:0 0 26px;font-size:14px;}
+  .role-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);text-align:left;font-size:14px;font-weight:600;color:var(--ink);transition:.15s;}
+  .role-btn:hover{border-color:var(--primary);background:var(--primary-tint);}
+  .role-btn .dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;}
+  .login-back{background:none;border:none;color:var(--ink-soft);font-size:13px;margin-bottom:16px;padding:0;text-decoration:underline;}
+  .field-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;}
+
+  /* ---------- Shell ---------- */
+  #app-shell{display:none;min-height:100vh;}
+  .sidebar{width:230px;flex-shrink:0;background:var(--primary-dark);color:#EAF1EC;min-height:100vh;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar .brand{color:#fff;font-weight:800;font-size:16px;padding:6px 10px 20px;line-height:1.25;}
+  .sidebar .brand small{display:block;font-family:'Inter';font-weight:500;font-size:11px;color:#A9C4B4;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:#CFE0D5;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);cursor:pointer;}
+  .nav-item.active{background:#fff;color:var(--primary-dark);}
+  .nav-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#7FA491;margin:18px 10px 6px;}
+  .sidebar-footer{margin-top:24px;padding:12px 10px;border-top:1px solid rgba(255,255,255,0.12);}
+  .who{font-size:13px;font-weight:700;color:#fff;}
+  .who-role{font-size:11px;color:#9FC2AC;margin-bottom:8px;}
+  .switch-btn{font-size:12px;color:#CFE0D5;background:rgba(255,255,255,0.08);border:none;padding:6px 10px;border-radius:6px;width:100%;text-align:left;}
+  .switch-btn:hover{background:rgba(255,255,255,0.16);}
+
+  .main{flex:1;min-width:0;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;flex-wrap:wrap;gap:10px;}
+  .topbar h2{margin:0;font-size:18px;}
+  .topbar .sub{color:var(--ink-soft);font-size:12.5px;margin-top:2px;}
+  .content{padding:26px 28px 60px;max-width:1180px;}
+
+  /* ---------- Common bits ---------- */
+  .btn{border-radius:8px;border:1px solid var(--border);background:var(--surface);padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink);}
+  .btn:hover{border-color:var(--primary);}
+  .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-danger{background:var(--danger-tint);border-color:var(--danger-tint);color:var(--danger);}
+  .btn-sm{padding:6px 10px;font-size:12.5px;}
+  .row-actions{display:flex;gap:8px;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+  .stat-card .n{font-family:'Manrope';font-size:26px;font-weight:800;color:var(--primary-dark);}
+  .stat-card .l{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-top:2px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:18px;}
+  .card h3{margin:0 0 14px;font-size:14.5px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .card-head h3{margin:0;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);padding:8px 10px;border-bottom:1px solid var(--border);}
+  td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .empty-row{padding:30px 10px;text-align:center;color:var(--ink-soft);font-size:13px;}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+  .badge-green{background:var(--primary-tint);color:var(--primary-dark);}
+  .badge-amber{background:var(--amber-tint);color:#8A5A10;}
+  .badge-grey{background:#EDEEEA;color:#6B7268;}
+  .badge-red{background:var(--danger-tint);color:var(--danger);}
+
+  .growth-track{display:flex;gap:3px;width:46px;}
+  .growth-track span{flex:1;height:5px;border-radius:3px;background:#E3E7DF;}
+  .growth-track.s1 span:nth-child(1){background:var(--amber);}
+  .growth-track.s2 span:nth-child(1),.growth-track.s2 span:nth-child(2){background:var(--primary);}
+  .growth-track.s3 span{background:var(--primary-dark);}
+  .growth-track.s0 span{background:#D8D1CB;}
+
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+  .tab{padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);border-bottom:2px solid transparent;cursor:pointer;}
+  .tab.active{color:var(--primary-dark);border-color:var(--primary);}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-group{margin-bottom:2px;}
+  .form-group.full{grid-column:1/-1;}
+  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px;}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;background:#fff;color:var(--ink);}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:2px solid var(--primary);outline-offset:0;border-color:var(--primary);}
+  .checklist{border:1px solid var(--border);border-radius:8px;padding:10px 12px;max-height:200px;overflow-y:auto;}
+  .checklist label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:5px 2px;color:var(--ink);}
+  .checklist .parish-sub{margin-left:22px;padding-left:10px;border-left:2px solid var(--border);margin-bottom:6px;}
+  .benefit-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+  .benefit-row:last-child{border-bottom:none;}
+  .benefit-name{font-weight:600;font-size:13.5px;}
+  .benefit-name small{display:block;font-weight:400;color:var(--ink-soft);font-size:11.5px;margin-top:2px;}
+  .toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle .track{position:absolute;inset:0;background:#D8DDD3;border-radius:20px;transition:.15s;}
+  .toggle .track:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
+  .toggle input:checked + .track{background:var(--primary);}
+  .toggle input:checked + .track:before{transform:translateX(16px);}
+
+  .benefit-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .benefit-card{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+  .benefit-card.off{opacity:.45;}
+  .benefit-card .amt{font-family:'Manrope';font-size:20px;font-weight:800;color:var(--primary-dark);margin-top:6px;}
+  .benefit-card .tag{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+
+  .empty-state{text-align:center;padding:50px 20px;color:var(--ink-soft);}
+  .empty-state .em-title{font-weight:700;color:var(--ink);margin-bottom:4px;font-size:14.5px;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,28,22,0.45);align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 26px 22px;}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .modal-head h3{margin:0;font-size:16.5px;}
+  .modal-close{background:none;border:none;font-size:20px;color:var(--ink-soft);line-height:1;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+  .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .search-bar input,.search-bar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#fff;}
+  .search-bar input{flex:1;min-width:180px;}
+
+  .msg-item{padding:14px 0;border-bottom:1px solid var(--border);}
+  .msg-item:last-child{border-bottom:none;}
+  .msg-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:3px;}
+  .msg-subject{font-weight:700;font-size:13.5px;margin-bottom:3px;}
+  .msg-body{font-size:13px;color:var(--ink);line-height:1.5;}
+  .msg-unread .msg-subject:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:6px;}
+
+  .toast{position:fixed;bottom:22px;right:22px;background:var(--primary-dark);color:#fff;padding:12px 18px;border-radius:8px;font-size:13.5px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:99;display:none;}
+
+  @media (max-width:820px){
+    #app-shell{flex-direction:column;}
+    .sidebar{width:100%;height:auto;position:relative;min-height:auto;display:flex;flex-wrap:wrap;gap:4px;padding:14px;}
+    .sidebar .brand{width:100%;padding-bottom:10px;}
+    .sidebar-footer{width:100%;}
+    .form-grid{grid-template-columns:1fr;}
+    .content{padding:18px;}
+  }
+  /* ---------- Avatars ---------- */
+  .avatar{border-radius:50%;object-fit:cover;background:var(--primary-tint);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary-dark);flex-shrink:0;font-family:'Manrope';}
+  .avatar-lg{width:76px;height:76px;font-size:26px;}
+  .avatar-sm{width:34px;height:34px;font-size:13px;}
+  .avatar-xs{width:24px;height:24px;font-size:10.5px;}
+  .avatar-upload-wrap{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap;}
+  .avatar-upload-wrap input[type=file]{font-size:12px;max-width:180px;}
+  .login-mark img{width:100%;height:100%;object-fit:cover;border-radius:10px;}
+
+  /* ---------- Topbar extras: hamburger + bell ---------- */
+  .hamburger-btn{display:none;background:none;border:1px solid var(--border);border-radius:8px;width:36px;height:36px;align-items:center;justify-content:center;font-size:16px;margin-right:10px;}
+  .topbar-left{display:flex;align-items:center;}
+  .bell-btn{position:relative;background:none;border:1px solid var(--border);border-radius:8px;width:36px;height:36px;font-size:15px;display:inline-flex;align-items:center;justify-content:center;}
+  .bell-dot{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;border-radius:10px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:19;}
+  .sidebar-overlay.open{display:block;}
+
+  /* ---------- Password / auth ---------- */
+  .login-error{background:var(--danger-tint);color:var(--danger);font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;margin-bottom:12px;}
+  .pass-hint{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .storage-ok{background:var(--primary-tint);color:var(--primary-dark);font-size:12px;font-weight:600;padding:9px 12px;border-radius:8px;margin-bottom:16px;line-height:1.5;}
+  .storage-warn{background:var(--amber-tint);color:#8A5A10;font-size:12px;font-weight:600;padding:9px 12px;border-radius:8px;margin-bottom:16px;line-height:1.5;}
+  .install-banner{position:fixed;left:14px;right:14px;bottom:14px;max-width:520px;margin:0 auto;background:var(--primary-dark);color:#fff;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;z-index:60;box-shadow:0 8px 28px rgba(0,0,0,0.22);font-size:13px;}
+  .install-banner-actions{display:flex;gap:8px;flex-shrink:0;}
+  .install-banner .btn{border-color:transparent;}
+  .install-banner .btn:not(.btn-primary){background:rgba(255,255,255,0.12);color:#fff;}
+
+  /* ---------- Color swatch input ---------- */
+  .color-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .color-row input[type=color]{width:44px;height:36px;border:1px solid var(--border);border-radius:8px;padding:2px;background:#fff;}
+
+  @media (max-width:820px){
+    .hamburger-btn{display:inline-flex;}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;height:100vh;width:250px;z-index:20;transform:translateX(-105%);transition:transform .2s ease;display:flex;flex-direction:column;flex-wrap:nowrap;}
+    .sidebar.open{transform:translateX(0);}
+  }
+  @media (max-width:480px){
+    .login-card{padding:28px 22px;}
+    .content{padding:14px;}
+    .topbar{padding:12px 14px;}
+    .card{padding:14px 16px;}
+    .stat-card .n{font-size:22px;}
+    .modal{padding:20px 16px 16px;}
+    table{font-size:12.5px;}
+    th,td{padding:8px 6px;}
+  }
+  /* Mobile-friendly: iOS/Android auto-zoom on input focus if font-size is under 16px —
+     keep all form controls at 16px on touch-sized screens so nobody has to pinch-zoom. */
+  @media (max-width:820px){
+    .form-group input,.form-group select,.form-group textarea,
+    .search-bar input,.search-bar select,
+    #org-login-pw,#trainer-login-pw,#trainer-login-select,
+    .checklist label{font-size:16px;}
+    .btn{padding:11px 16px;font-size:14px;}
+    .btn-sm{padding:9px 12px;font-size:13px;}
+    h1{font-size:20px;}
+    .topbar h2{font-size:16px;}
+    table{font-size:13px;}
+    .role-btn{padding:16px;}
+  }
+
+  /* ---------- Print ---------- */
+  @media print{
+    .sidebar,.topbar,.btn,.search-bar,.tabs,.modal-overlay,.toast,.sidebar-overlay,.row-actions,.hamburger-btn,.bell-btn{display:none !important;}
+    .content{padding:0;max-width:100%;}
+    .card{border:none;box-shadow:none;padding:0;margin-bottom:22px;}
+    body{background:#fff;}
+  }
+  @media print{
+    body.printing-certificate .sidebar,body.printing-certificate .topbar,body.printing-certificate .toast{display:none !important;}
+    body.printing-certificate .modal-overlay{display:flex !important;position:static !important;background:none !important;padding:0 !important;}
+    body.printing-certificate .modal{box-shadow:none;max-width:100%;max-height:none;overflow:visible;padding:0;}
+    body.printing-certificate .cert-actions{display:none !important;}
+    body.printing-certificate .modal-close{display:none !important;}
+    body.printing-certificate .modal-head{display:none !important;}
+  }
+
+  /* ---------- Certificate ---------- */
+  .cert-frame{border:3px solid var(--primary);padding:10px;border-radius:4px;background:#fff;}
+  .cert-inner{border:1.5px solid var(--amber);border-radius:2px;padding:40px 36px;text-align:center;position:relative;}
+  .cert-kicker{font-family:'Manrope';font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--primary-dark);font-weight:800;margin-bottom:6px;}
+  .cert-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--ink);margin:0 0 18px;letter-spacing:.02em;}
+  .cert-body-text{font-size:13.5px;color:var(--ink-soft);}
+  .cert-name{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--primary-dark);margin:14px 0;border-bottom:1.5px solid var(--amber);display:inline-block;padding:0 20px 8px;}
+  .cert-field{font-size:15px;font-weight:700;color:var(--ink);margin:10px 0 4px;}
+  .cert-meta{display:flex;justify-content:space-around;margin-top:34px;font-size:12px;color:var(--ink-soft);flex-wrap:wrap;gap:16px;}
+  .cert-meta div{border-top:1px solid var(--border);padding-top:8px;min-width:140px;}
+  .cert-seal{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Manrope';font-weight:800;font-size:12px;margin:0 auto 14px;border:3px solid var(--amber-tint);}
+  .cert-logo-img{max-height:64px;max-width:220px;object-fit:contain;margin:0 auto 14px;display:block;}
+  .cert-id{font-size:10px;color:var(--ink-soft);margin-top:24px;letter-spacing:.03em;}
+  #locations-map{width:100%;height:60vh;min-height:360px;border-radius:var(--radius);border:1px solid var(--border);}
+  .map-offline-note{font-size:12px;color:var(--ink-soft);margin-top:10px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login-screen">
+  <div class="login-card" id="login-card-inner">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app-shell" style="display:flex;">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger-btn" onclick="toggleSidebar()">&#9776;</button>
+        <div>
+          <h2 id="topbar-title">Dashboard</h2>
+          <div class="sub" id="topbar-sub"></div>
+        </div>
+      </div>
+      <div id="topbar-right" style="display:flex;align-items:center;gap:10px;">
+        <button class="bell-btn" onclick="goToCorrespondence()" title="Messages">&#128276;<span class="bell-dot" id="bell-dot" style="display:none;">0</span></button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   NIEHUB AGRI ACADEMY — data management app
+   Data persists via window.storage (shared across all users)
+   ============================================================ */
+
+const FIELDS = ["Eucalyptus Cloning","Fruits Grafting","Pine Propagation","Others"];
+const DEFAULT_DISTRICTS = ["Kampala","Wakiso","Mukono","Jinja","Mbale","Mbarara","Gulu","Lira","Arua","Masaka","Fort Portal","Hoima","Soroti","Kabale","Kasese","Luwero","Iganga","Kabarole","Rukungiri","Kitgum"];
+
+let DB = { niehubers:[], niehubees:[], districts:[], parishes:[], payments:[], messages:[], otherPayees:[], orgSettings:null, loginLogs:[], trainingSessions:[], materials:[], certificates:[] };
+const DEFAULT_ORG_SETTINGS = { password:'Oknieok@1', name:'NIEHUB AGRI ACADEMY', primaryColor:'#2F6E4F', amberColor:'#D98E2B', logo:'data:image/jpeg;base64,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', photo:'data:image/jpeg;base64,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' };
+let session = { role:null, trainerId:null }; // role: 'org' | 'trainer'
+let pick = { districtIds:[], parishIds:[] }; // temp state for the assign-locations picker
+let programPick = {}; // temp state for the NIEHUBee field-of-study picker: { field: status }
+let editingTrainerId = null;
+let editingTraineeId = null;
+
+function uid(p){ return (p||'id')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ============================================================
+   SHARED DATABASE SETUP (Firebase Firestore)
+   ------------------------------------------------------------
+   GitHub Pages (and any plain static host) can only serve files —
+   it cannot store data anywhere. Without a real database, every
+   visitor's browser keeps its own private, disconnected copy of
+   the data, which is why teammates could not see each other's
+   records. Firestore fixes this: everyone's browser reads/writes
+   the same cloud database.
+
+   TO ENABLE (free, ~5 minutes):
+   1. Go to https://console.firebase.google.com → "Add project" (name it anything, e.g. "niehub-agri-academy").
+   2. In the left menu: Build → Firestore Database → "Create database" → start in TEST MODE → choose any region.
+   3. Click the gear icon (Project settings) → scroll to "Your apps" → click the </> (Web) icon → register the app (nickname anything, no hosting needed).
+   4. Firebase will show a `firebaseConfig` object — copy those values into FIREBASE_CONFIG below.
+   5. Re-upload this file to GitHub Pages. Reload the page — the "Local device only" warning
+      on the login screen should disappear once it's connected.
+
+   Test-mode Firestore rules are open to anyone with the project's config, which is fine for
+   an internal team tool but not for sensitive data. If you want it locked down, in Firestore →
+   Rules, you can restrict access further (ask your developer, or ask me for help with this).
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDX8Sdm0DEV2GnLGlNEkJ2H3d_A6pyHDTM",
+  authDomain: "niehub-agri-academy.firebaseapp.com",
+  projectId: "niehub-agri-academy",
+  storageBucket: "niehub-agri-academy.firebasestorage.app",
+  messagingSenderId: "74277018827",
+  appId: "1:74277018827:web:94d69069df48b7b4048f4e"
+};
+let fireDb = null;
+let HAS_FIREBASE = false;
+try{
+  if(FIREBASE_CONFIG.apiKey && typeof firebase !== 'undefined'){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    fireDb = firebase.firestore();
+    HAS_FIREBASE = true;
+  }
+}catch(e){ console.error('Firebase init failed', e); }
+
+// Uses the Claude artifact storage API when available (live preview inside Claude).
+const HAS_ARTIFACT_STORAGE = (typeof window!=='undefined' && window.storage && typeof window.storage.get==='function');
+
+// Storage priority for org-wide (shared) data: Firestore (real cross-device database) →
+// Claude artifact storage (only exists inside the Claude.ai preview) → localStorage
+// (last resort — this device only, kept so the app still works before Firebase is configured).
+// Personal, per-device data (the login session) intentionally always stays local.
+async function sGet(key, shared){
+  if(shared && HAS_FIREBASE){
+    try{
+      const snap = await fireDb.collection('niehub_data').doc(key).get();
+      return snap.exists ? JSON.parse(snap.data().value) : null;
+    }catch(e){ console.error('Firestore get failed', key, e); }
+  }
+  if(HAS_ARTIFACT_STORAGE){
+    try{
+      const r = await window.storage.get(key, shared);
+      return r ? JSON.parse(r.value) : null;
+    }catch(e){ return null; }
+  }
+  try{
+    const raw = localStorage.getItem('niehub__'+key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+async function sSet(key, value, shared){
+  if(shared && HAS_FIREBASE){
+    try{ await fireDb.collection('niehub_data').doc(key).set({ value: JSON.stringify(value), updatedAt: Date.now() }); return; }
+    catch(e){ console.error('Firestore set failed', key, e); }
+  }
+  if(HAS_ARTIFACT_STORAGE){
+    try{ await window.storage.set(key, JSON.stringify(value), shared); return; }
+    catch(e){ console.error('storage set failed', key, e); }
+  }
+  try{ localStorage.setItem('niehub__'+key, JSON.stringify(value)); }
+  catch(e){ console.error('local storage set failed', key, e); }
+}
+
+async function persist(key){ await sSet(key, DB[key], true); }
+async function persistSession(){ await sSet('session', session, false); }
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ t.style.display='none'; }, 2600);
+}
+
+/* ---------------- Boot ---------------- */
+async function boot(){
+  const loaded = await Promise.all([
+    sGet('niehubers', true), sGet('niehubees', true), sGet('districts', true),
+    sGet('parishes', true), sGet('payments', true), sGet('messages', true), sGet('session', false),
+    sGet('otherPayees', true), sGet('orgSettings', true),
+    sGet('loginLogs', true), sGet('trainingSessions', true), sGet('materials', true), sGet('certificates', true)
+  ]);
+  DB.niehubers = loaded[0] || [];
+  DB.niehubees = loaded[1] || [];
+  DB.districts = loaded[2] || DEFAULT_DISTRICTS.map(name=>({id:uid('dist'), name}));
+  DB.parishes  = loaded[3] || [];
+  DB.payments  = loaded[4] || [];
+  DB.messages  = loaded[5] || [];
+  DB.otherPayees = loaded[7] || [];
+  DB.orgSettings = Object.assign({}, DEFAULT_ORG_SETTINGS, loaded[8] || {});
+  DB.loginLogs = loaded[9] || [];
+  DB.trainingSessions = loaded[10] || [];
+  DB.materials = loaded[11] || [];
+  DB.certificates = loaded[12] || [];
+  if(!loaded[2]) await persist('districts');
+  if(!loaded[8]) await persist('orgSettings');
+  // Backfill defaults for any NIEHUBer registered before password support existed
+  let needsSave = false;
+  DB.niehubers.forEach(t=>{ if(!t.password){ t.password = '2026'; needsSave = true; } });
+  if(needsSave) await persist('niehubers');
+  // Migrate NIEHUBees from the old single fieldOfStudy/status to the new multi-programme model
+  let traineesMigrated = false;
+  DB.niehubees.forEach(t=>{
+    if(!t.programs){
+      t.programs = t.fieldOfStudy ? [{ field: t.fieldOfStudy, status: t.status || 'Enrolled' }] : [];
+      traineesMigrated = true;
+    }
+  });
+  if(traineesMigrated) await persist('niehubees');
+  applyAppearance();
+
+  const savedSession = loaded[6];
+  if(savedSession && savedSession.role==='org'){
+    session = savedSession; showApp();
+  } else if(savedSession && savedSession.role==='trainer' && DB.niehubers.find(t=>t.id===savedSession.trainerId)){
+    session = savedSession; showApp();
+  } else {
+    renderLogin('choose');
+  }
+  startMessagePolling();
+}
+boot();
+
+/* ---------------- Installable app (PWA) ---------------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* sw.js not uploaded yet — app still works as a normal site */ });
+  });
+}
+let __deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  __deferredInstallPrompt = e;
+  showInstallBanner();
+});
+window.addEventListener('appinstalled', ()=>{ hideInstallBanner(); __deferredInstallPrompt = null; });
+
+// iOS Safari never fires beforeinstallprompt — show manual "Add to Home Screen" steps instead.
+function isIOSSafari(){
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isStandalone = window.navigator.standalone === true;
+  return isIOS && !isStandalone;
+}
+function showInstallBanner(){
+  if(sessionStorage.getItem('niehub_install_dismissed')) return;
+  if(document.getElementById('install-banner')) return;
+  const bar = document.createElement('div');
+  bar.id = 'install-banner';
+  bar.className = 'install-banner';
+  bar.innerHTML = `
+    <span>📲 Install ${DB.orgSettings ? DB.orgSettings.name : 'NIEHUB AGRI ACADEMY'} as an app for quicker access</span>
+    <span class="install-banner-actions">
+      <button class="btn btn-sm btn-primary" onclick="triggerInstall()">Install</button>
+      <button class="btn btn-sm" onclick="hideInstallBanner(true)">Not now</button>
+    </span>
+  `;
+  document.body.appendChild(bar);
+}
+function showIOSInstallBanner(){
+  if(sessionStorage.getItem('niehub_install_dismissed')) return;
+  if(document.getElementById('install-banner')) return;
+  const bar = document.createElement('div');
+  bar.id = 'install-banner';
+  bar.className = 'install-banner';
+  bar.innerHTML = `
+    <span>📲 To install: tap the Share icon, then "Add to Home Screen"</span>
+    <span class="install-banner-actions">
+      <button class="btn btn-sm" onclick="hideInstallBanner(true)">Got it</button>
+    </span>
+  `;
+  document.body.appendChild(bar);
+}
+function hideInstallBanner(remember){
+  const bar = document.getElementById('install-banner');
+  if(bar) bar.remove();
+  if(remember) sessionStorage.setItem('niehub_install_dismissed', '1');
+}
+async function triggerInstall(){
+  if(!__deferredInstallPrompt) return;
+  __deferredInstallPrompt.prompt();
+  await __deferredInstallPrompt.userChoice;
+  __deferredInstallPrompt = null;
+  hideInstallBanner();
+}
+
+function applyAppearance(){
+  // Standalone build declares CSS vars on :root (documentElement). The Pagelayer
+  // embed build declares the same vars on .niehub-app-scope instead — target
+  // whichever one actually exists so appearance customization works in both.
+  const varTarget = document.querySelector('.niehub-app-scope') || document.documentElement;
+  const root = varTarget.style;
+  root.setProperty('--primary', DB.orgSettings.primaryColor);
+  root.setProperty('--primary-dark', shadeColor(DB.orgSettings.primaryColor, -18));
+  root.setProperty('--primary-tint', shadeColor(DB.orgSettings.primaryColor, 78));
+  root.setProperty('--amber', DB.orgSettings.amberColor);
+  root.setProperty('--amber-tint', shadeColor(DB.orgSettings.amberColor, 82));
+  document.title = DB.orgSettings.name;
+}
+function shadeColor(hex, percent){
+  try{
+    let [r,g,b] = hex.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16));
+    const amt = Math.round(2.55*percent);
+    r = Math.min(255,Math.max(0,r+amt)); g = Math.min(255,Math.max(0,g+amt)); b = Math.min(255,Math.max(0,b+amt));
+    return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return hex; }
+}
+
+/* ---------------- Mobile sidebar (off-canvas) ---------------- */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ---------------- Avatars & photo upload ---------------- */
+function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function avatarHtml(photo, name, size){
+  const cls = 'avatar avatar-'+(size||'sm');
+  const px = size==='lg'?76:size==='xs'?24:34;
+  return photo
+    ? `<img class="${cls}" src="${photo}" style="width:${px}px;height:${px}px;">`
+    : `<div class="${cls}" style="width:${px}px;height:${px}px;">${initials(name)}</div>`;
+}
+// Reads an <input type=file>, downsizes the image to keep storage small, returns a dataURL via callback
+function handlePhotoInput(inputEl, callback){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = function(){
+      const maxDim = 220;
+      let w = img.width, h = img.height;
+      if(w > h){ if(w > maxDim){ h = Math.round(h*maxDim/w); w = maxDim; } }
+      else { if(h > maxDim){ w = Math.round(w*maxDim/h); h = maxDim; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function removeMyPhoto(){
+  const t = currentTrainer();
+  t.photo = null; persist('niehubers'); renderTrainerProfile(); renderSidebar(); toast('Profile picture removed');
+}
+function removeOrgPhoto(){
+  DB.orgSettings.logo = ''; DB.orgSettings.photo = '';
+  persist('orgSettings'); renderOrgSettings(); renderSidebar(); applyAppearance(); toast('Logo removed');
+}
+// Reads any small file (not just images) as a base64 dataURL, with a size guard.
+// maxKB keeps things well under Firestore's 1MB-per-document ceiling.
+function handleFileInput(inputEl, maxKB, callback){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  if(file.size > maxKB*1024){
+    toast(`File is too large — please keep it under ${maxKB}KB`);
+    inputEl.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => callback({ name: file.name, data: ev.target.result, size: file.size });
+  reader.readAsDataURL(file);
+}
+function downloadDataUrl(dataUrl, filename){
+  const a = document.createElement('a');
+  a.href = dataUrl; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* ---------------- Certificates ---------------- */
+// A NIEHUBee can now be Graduated in more than one field — if there's more
+// than one, ask which one to issue a certificate for before showing it.
+function openCertificate(traineeId){
+  const t = DB.niehubees.find(x=>x.id===traineeId);
+  const graduated = (t.programs||[]).filter(p=>p.status==='Graduated');
+  if(!graduated.length){ toast('No completed programme yet for this NIEHUBee'); return; }
+  if(graduated.length===1){ showCertificate(traineeId, graduated[0].field); return; }
+  openModal(`Certificate — ${t.name}`, `
+    <p style="font-size:13.5px;color:var(--ink-soft);margin-top:0;">${t.name} has completed more than one programme. Choose which certificate to issue:</p>
+    ${graduated.map(p=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+        <strong>${p.field}</strong>
+        <button class="btn btn-sm btn-primary" onclick="showCertificate('${traineeId}','${p.field}')">Generate</button>
+      </div>
+    `).join('')}
+    <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Close</button></div>
+  `);
+}
+function showCertificate(traineeId, field){
+  const t = DB.niehubees.find(x=>x.id===traineeId);
+  const trainer = DB.niehubers.find(x=>x.id===t.trainerId);
+  const d = DB.districts.find(x=>x.id===t.districtId);
+  const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+  const certId = uid('cert').toUpperCase();
+  DB.certificates.push({ id: certId, traineeId, field, dateIssued: new Date().toISOString().slice(0,10) });
+  persist('certificates');
+  openModal(`Certificate — ${t.name}`, `
+    <div class="cert-frame" id="cert-frame-target">
+      <div class="cert-inner">
+        ${DB.orgSettings.logo ? `<img class="cert-logo-img" src="${DB.orgSettings.logo}" crossorigin="anonymous">` : `<div class="cert-seal">${initials(DB.orgSettings.name)}</div>`}
+        <div class="cert-kicker">${DB.orgSettings.name}</div>
+        <h1 class="cert-title">Certificate of Completion</h1>
+        <p class="cert-body-text">This is to certify that</p>
+        <div class="cert-name">${t.name}</div>
+        <p class="cert-body-text">has successfully completed hands-on training in</p>
+        <div class="cert-field">${field}</div>
+        <p class="cert-body-text">under the tree nursery operator training programme, demonstrating practical<br>competence and dedication throughout the course.</p>
+        <div class="cert-meta">
+          <div>${dateStr}<br><strong>Date issued</strong></div>
+          <div>${trainer?trainer.name:'—'}<br><strong>NIEHUBer / Trainer</strong></div>
+          <div>${d?d.name:'—'}<br><strong>Duty station</strong></div>
+        </div>
+        <div class="cert-id">Certificate ID: ${certId} · Issued by ${DB.orgSettings.name}</div>
+      </div>
+    </div>
+    <div id="cert-download-status" style="font-size:12px;color:var(--ink-soft);margin-top:8px;display:none;">Preparing HD image…</div>
+    <div class="modal-actions cert-actions">
+      <button type="button" class="btn" onclick="closeModal()">Close</button>
+      <button type="button" class="btn" onclick="printCertificate()">Print / Save as PDF</button>
+      <button type="button" class="btn btn-primary" onclick="downloadCertificateHD('${t.name.replace(/'/g,"")}','${field}')">Download HD (PNG)</button>
+    </div>
+  `);
+}
+function downloadCertificateHD(traineeName, field){
+  const el = document.getElementById('cert-frame-target');
+  const statusEl = document.getElementById('cert-download-status');
+  if(!window.html2canvas){ toast('HD export library failed to load — check your connection and try again'); return; }
+  statusEl.style.display = 'block';
+  html2canvas(el, { scale: 3, backgroundColor: '#ffffff', useCORS: true })
+    .then(canvas => {
+      statusEl.style.display = 'none';
+      const link = document.createElement('a');
+      const safeName = traineeName.replace(/[^a-z0-9]+/gi,'-');
+      const safeField = field.replace(/[^a-z0-9]+/gi,'-');
+      link.download = `certificate-${safeName}-${safeField}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      toast('HD certificate downloaded');
+    })
+    .catch(err => {
+      statusEl.style.display = 'none';
+      console.error('HD certificate export failed', err);
+      toast('Could not generate HD image — try Print / Save as PDF instead');
+    });
+}
+function printCertificate(){
+  document.body.classList.add('printing-certificate');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('printing-certificate'), 500);
+}
+
+/* ================= ORG: Certificates issued (log) ================= */
+function renderOrgCertificates(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="row-actions" style="justify-content:flex-end;margin-bottom:12px;">
+      <button class="btn btn-sm" onclick="exportCertificatesCSV()">Export CSV</button>
+      <button class="btn btn-sm" onclick="printPage()">Print</button>
+    </div>
+    <div class="card"><div id="cert-log-wrap"></div></div>
+  `;
+  renderCertLogTable();
+}
+function renderCertLogTable(){
+  const rows = [...DB.certificates].sort((a,b)=>b.dateIssued.localeCompare(a.dateIssued));
+  document.getElementById('cert-log-wrap').innerHTML = rows.length ? `
+    <table><thead><tr><th>NIEHUBee</th><th>Field</th><th>Date issued</th><th>Trainer</th><th></th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const t = DB.niehubees.find(x=>x.id===r.traineeId);
+      const trainer = t ? DB.niehubers.find(x=>x.id===t.trainerId) : null;
+      return `<tr>
+        <td>${t?t.name:'(removed)'}</td><td>${r.field}</td><td>${r.dateIssued}</td><td>${trainer?trainer.name:'—'}</td>
+        <td>${t ? `<button class="btn btn-sm" onclick="showCertificate('${t.id}','${r.field}')">Reprint</button>` : ''}</td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : emptyState('No certificates issued yet','Certificates appear here once generated from a graduated NIEHUBee.');
+}
+function exportCertificatesCSV(){
+  const rows = [...DB.certificates].sort((a,b)=>b.dateIssued.localeCompare(a.dateIssued)).map(r=>{
+    const t = DB.niehubees.find(x=>x.id===r.traineeId);
+    const trainer = t ? DB.niehubers.find(x=>x.id===t.trainerId) : null;
+    return [t?t.name:'(removed)', r.field, r.dateIssued, trainer?trainer.name:'—'];
+  });
+  exportCSV('certificates-issued.csv', ['NIEHUBee','Field','Date issued','Trainer'], rows);
+}
+
+/* ---------------- Correspondence: unread tracking, bell & sound ---------------- */
+function viewerKey(){ return session.role==='org' ? 'org' : session.trainerId; }
+function unreadFor(viewer){
+  if(!viewer) return 0;
+  return DB.messages.filter(m => (m.to===viewer || m.to==='ALL') && m.from!==viewer && !(m.readBy||[]).includes(viewer)).length;
+}
+function updateBell(){
+  const dot = document.getElementById('bell-dot');
+  if(!dot) return;
+  const n = unreadFor(viewerKey());
+  dot.style.display = n>0 ? 'flex' : 'none';
+  dot.textContent = n>9 ? '9+' : n;
+}
+function markMessagesReadForViewer(viewer){
+  let changed = false;
+  DB.messages.forEach(m=>{
+    if((m.to===viewer || m.to==='ALL') && m.from!==viewer){
+      m.readBy = m.readBy || [];
+      if(!m.readBy.includes(viewer)){ m.readBy.push(viewer); changed = true; }
+    }
+  });
+  if(changed) persist('messages');
+  updateBell();
+}
+function goToCorrespondence(){ navigate(session.role==='org' ? 'org-correspondence' : 'trainer-correspondence'); }
+function playNotifySound(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(880, ctx.currentTime);
+    o.frequency.setValueAtTime(1180, ctx.currentTime+0.11);
+    g.gain.setValueAtTime(0.18, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.35);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime+0.36);
+  }catch(e){ /* audio not available */ }
+}
+let __lastUnreadCount = 0;
+function startMessagePolling(){
+  __lastUnreadCount = unreadFor(viewerKey());
+  updateBell();
+  setInterval(async ()=>{
+    if(!session.role) return;
+    const fresh = await sGet('messages', true);
+    if(fresh){ DB.messages = fresh; }
+    const n = unreadFor(viewerKey());
+    if(n > __lastUnreadCount){ playNotifySound(); }
+    __lastUnreadCount = n;
+    updateBell();
+  }, 12000);
+}
+
+/* ---------------- Export & print ---------------- */
+function exportCSV(filename, headers, rows){
+  const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
+  const csv = [headers.map(esc).join(','), ...rows.map(r=>r.map(esc).join(','))].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename.endsWith('.csv') ? filename : filename+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function printPage(){ window.print(); }
+
+/* ---------------- Login screens ---------------- */
+function renderLogin(mode){
+  const box = document.getElementById('login-card-inner');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-shell').style.display='none';
+
+  if(mode==='choose'){
+    box.innerHTML = `
+      <div class="login-mark">${DB.orgSettings.logo ? `<img src="${DB.orgSettings.logo}">` : 'NA'}</div>
+      <h1>${DB.orgSettings.name}</h1>
+      <p class="sub">Tree nursery operator training — data management</p>
+      ${storageStatusBanner()}
+      <div class="role-btn" onclick="renderLogin('org')"><span class="dot"></span> Continue as Organization</div>
+      <div class="role-btn" onclick="renderLogin('trainer')"><span class="dot"></span> Continue as a NIEHUBer (Trainer)</div>
+    `;
+  } else if(mode==='org'){
+    box.innerHTML = `
+      <button class="login-back" onclick="renderLogin('choose')">&larr; Back</button>
+      <h1>Organization Login</h1>
+      <p class="sub">Manage NIEHUBers, districts, trainees, salary and correspondence.</p>
+      <div id="org-login-error"></div>
+      <label class="field-label">Password</label>
+      <input type="password" id="org-login-pw" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;font-size:14px;" onkeydown="if(event.key==='Enter')loginAsOrg()">
+      <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="loginAsOrg()">Enter Organization Dashboard</button>
+    `;
+    setTimeout(()=>document.getElementById('org-login-pw')?.focus(), 50);
+  } else if(mode==='trainer'){
+    const opts = DB.niehubers.map(t=>`<option value="${t.id}">${t.name}${t.status==='inactive'?' (inactive)':''}</option>`).join('');
+    box.innerHTML = `
+      <button class="login-back" onclick="renderLogin('choose')">&larr; Back</button>
+      <h1>NIEHUBer Login</h1>
+      <p class="sub">Select your name and enter your password.</p>
+      ${DB.niehubers.length ? `
+        <div id="trainer-login-error"></div>
+        <label class="field-label">Your name</label>
+        <select id="trainer-login-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;font-size:14px;">${opts}</select>
+        <label class="field-label">Password</label>
+        <input type="password" id="trainer-login-pw" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:14px;" onkeydown="if(event.key==='Enter')loginAsTrainer()">
+        <p class="pass-hint">New NIEHUBers use the default password <strong>2026</strong> until they change it.</p>
+        <button class="btn btn-primary" style="width:100%;padding:12px;margin-top:8px;" onclick="loginAsTrainer()">Open My Dashboard</button>
+      ` : `<div class="empty-state" style="padding:20px 0;"><div class="em-title">No NIEHUBers registered yet</div>Ask the organization to register you first.</div>`}
+    `;
+  }
+}
+function storageStatusBanner(){
+  if(HAS_FIREBASE){
+    return `<div class="storage-ok">🟢 Shared storage connected — everyone sees the same data.</div>`;
+  }
+  if(HAS_ARTIFACT_STORAGE){
+    return `<div class="storage-warn">🟡 Running inside Claude's preview — shared across this preview only.</div>`;
+  }
+  return `<div class="storage-warn">🟠 Shared storage not set up — data entered here is only saved on this device/browser. Ask your developer to connect Firebase (see FIREBASE_CONFIG instructions in the file) so your whole team sees the same records.</div>`;
+}
+function loginAsOrg(){
+  const pw = document.getElementById('org-login-pw').value;
+  if(pw !== DB.orgSettings.password){
+    document.getElementById('org-login-error').innerHTML = `<div class="login-error">Incorrect password. Please try again.</div>`;
+    return;
+  }
+  session = {role:'org', trainerId:null}; persistSession(); showApp();
+  recordLogin('org', null);
+}
+function loginAsTrainer(){
+  const id = document.getElementById('trainer-login-select').value;
+  const pw = document.getElementById('trainer-login-pw').value;
+  const t = DB.niehubers.find(x=>x.id===id);
+  if(!t || pw !== (t.password||'2026')){
+    document.getElementById('trainer-login-error').innerHTML = `<div class="login-error">Incorrect password. Please try again.</div>`;
+    return;
+  }
+  session = {role:'trainer', trainerId:id}; persistSession(); showApp();
+  recordLogin('trainer', id);
+}
+function logout(){ session = {role:null, trainerId:null}; sSet('session', session, false); renderLogin('choose'); }
+
+/* ---------------- Login activity: device + approximate location ---------------- */
+function parseDevice(ua){
+  ua = ua || navigator.userAgent;
+  let os = 'Unknown OS';
+  if(/iPhone|iPad|iPod/.test(ua)) os = 'iOS';
+  else if(/Android/.test(ua)) os = 'Android';
+  else if(/Windows/.test(ua)) os = 'Windows';
+  else if(/Mac OS X/.test(ua)) os = 'macOS';
+  else if(/Linux/.test(ua)) os = 'Linux';
+  let browser = 'Unknown browser';
+  if(/Edg\//.test(ua)) browser = 'Edge';
+  else if(/OPR\//.test(ua)) browser = 'Opera';
+  else if(/Chrome\//.test(ua) && !/Chromium/.test(ua)) browser = 'Chrome';
+  else if(/Safari\//.test(ua) && !/Chrome/.test(ua)) browser = 'Safari';
+  else if(/Firefox\//.test(ua)) browser = 'Firefox';
+  const deviceType = /Mobi|Android|iPhone|iPad/.test(ua) ? (/iPad/.test(ua)?'Tablet':'Mobile') : 'Desktop';
+  return { os, browser, deviceType };
+}
+async function recordLogin(viewerType, trainerId){
+  const { os, browser, deviceType } = parseDevice();
+  const now = new Date();
+  const entry = {
+    id: uid('log'), viewerType, trainerId,
+    date: now.toISOString().slice(0,10), time: now.toTimeString().slice(0,5),
+    os, browser, deviceType, city:'', region:'', country:''
+  };
+  try{
+    const resp = await fetch('https://ipapi.co/json/');
+    if(resp.ok){
+      const geo = await resp.json();
+      entry.city = geo.city || ''; entry.region = geo.region || ''; entry.country = geo.country_name || '';
+      entry.ip = geo.ip || '';
+    }
+  }catch(e){ /* offline or blocked — location stays blank, login still recorded */ }
+  DB.loginLogs.push(entry);
+  if(DB.loginLogs.length > 500) DB.loginLogs = DB.loginLogs.slice(-500); // keep it bounded
+  persist('loginLogs');
+}
+
+/* ---------------- App shell ---------------- */
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-shell').style.display='flex';
+  renderSidebar();
+  navigate(session.role==='org' ? 'org-dashboard' : 'trainer-dashboard');
+  if(isIOSSafari()) showIOSInstallBanner();
+}
+
+function currentTrainer(){ return DB.niehubers.find(t=>t.id===session.trainerId); }
+
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  if(session.role==='org'){
+    sb.innerHTML = `
+      <div class="brand" style="display:flex;align-items:center;gap:10px;">${avatarHtml(DB.orgSettings.logo, DB.orgSettings.name, 'sm')}<div>${DB.orgSettings.name}<small>Organization</small></div></div>
+      <div class="nav-item" data-v="org-dashboard" onclick="navigate('org-dashboard')">Dashboard</div>
+      <div class="nav-section-label">People</div>
+      <div class="nav-item" data-v="org-trainers" onclick="navigate('org-trainers')">NIEHUBers</div>
+      <div class="nav-item" data-v="org-trainees" onclick="navigate('org-trainees')">NIEHUBees</div>
+      <div class="nav-section-label">Setup</div>
+      <div class="nav-item" data-v="org-locations" onclick="navigate('org-locations')">Districts &amp; Parishes</div>
+      <div class="nav-section-label">Training</div>
+      <div class="nav-item" data-v="org-training-log" onclick="navigate('org-training-log')">Training Log</div>
+      <div class="nav-item" data-v="org-locations-map" onclick="navigate('org-locations-map')">Locations Map</div>
+      <div class="nav-item" data-v="org-materials" onclick="navigate('org-materials')">Training Materials</div>
+      <div class="nav-item" data-v="org-certificates" onclick="navigate('org-certificates')">Certificates</div>
+      <div class="nav-section-label">Finance</div>
+      <div class="nav-item" data-v="org-payments" onclick="navigate('org-payments')">Salary &amp; Payments</div>
+      <div class="nav-section-label">Communication</div>
+      <div class="nav-item" data-v="org-correspondence" onclick="navigate('org-correspondence')">Correspondence</div>
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" data-v="org-login-activity" onclick="navigate('org-login-activity')">Login Activity</div>
+      <div class="nav-item" data-v="org-settings" onclick="navigate('org-settings')">Settings</div>
+      <div class="sidebar-footer">
+        <div style="display:flex;align-items:center;gap:9px;">
+          ${avatarHtml(DB.orgSettings.photo, DB.orgSettings.name, 'sm')}
+          <div><div class="who">Organization</div><div class="who-role">Admin access</div></div>
+        </div>
+        <button class="switch-btn" style="margin-top:10px;" onclick="logout()">Switch account</button>
+      </div>
+    `;
+  } else {
+    const t = currentTrainer();
+    sb.innerHTML = `
+      <div class="brand" style="display:flex;align-items:center;gap:10px;">${avatarHtml(DB.orgSettings.logo, DB.orgSettings.name, 'sm')}<div>${DB.orgSettings.name}<small>NIEHUBer</small></div></div>
+      <div class="nav-item" data-v="trainer-dashboard" onclick="navigate('trainer-dashboard')">Dashboard</div>
+      <div class="nav-item" data-v="trainer-trainees" onclick="navigate('trainer-trainees')">My NIEHUBees</div>
+      <div class="nav-item" data-v="trainer-locations-map" onclick="navigate('trainer-locations-map')">My Locations Map</div>
+      <div class="nav-item" data-v="trainer-materials" onclick="navigate('trainer-materials')">Training Materials</div>
+      <div class="nav-item" data-v="trainer-payments" onclick="navigate('trainer-payments')">My Salary</div>
+      <div class="nav-item" data-v="trainer-correspondence" onclick="navigate('trainer-correspondence')">Correspondence</div>
+      <div class="nav-item" data-v="trainer-profile" onclick="navigate('trainer-profile')">My Profile</div>
+      <div class="sidebar-footer">
+        <div style="display:flex;align-items:center;gap:9px;">
+          ${avatarHtml(t?t.photo:null, t?t.name:'Trainer', 'sm')}
+          <div><div class="who">${t?t.name:'Trainer'}</div><div class="who-role">NIEHUBer</div></div>
+        </div>
+        <button class="switch-btn" style="margin-top:10px;" onclick="logout()">Switch account</button>
+      </div>
+    `;
+  }
+}
+
+const VIEW_META = {
+  'org-dashboard': ['Organization Dashboard','Overview of the academy'],
+  'org-trainers': ['NIEHUBers','Trainers, duty stations & assignments'],
+  'org-trainees': ['NIEHUBees','All registered trainees'],
+  'org-locations': ['Districts & Parishes','Duty stations used across the academy'],
+  'org-training-log': ['Training Log','Check-in / check-out activity for all NIEHUBers'],
+  'org-locations-map': ['Locations Map','Real GPS locations from training check-ins'],
+  'org-materials': ['Training Materials','Provide books & resources per programme'],
+  'org-certificates': ['Certificates','Certificates issued to NIEHUBees'],
+  'org-payments': ['Salary & Payments','Manage NIEHUBer pay and benefits'],
+  'org-correspondence': ['Correspondence','Messages & announcements'],
+  'org-login-activity': ['Login Activity','Where and how NIEHUBers are signing in'],
+  'org-settings': ['Settings','Appearance, security & organization profile'],
+  'trainer-dashboard': ['My Dashboard','Your training activity'],
+  'trainer-trainees': ['My NIEHUBees','Trainees you have registered'],
+  'trainer-locations-map': ['My Locations Map','GPS locations from your training check-ins'],
+  'trainer-materials': ['Training Materials','Resources provided by the organization'],
+  'trainer-payments': ['My Salary','Pay, allowances & history'],
+  'trainer-correspondence': ['Correspondence','Messages with the organization'],
+  'trainer-profile': ['My Profile','Photo, password & personal details'],
+};
+
+function navigate(view){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.v===view));
+  const meta = VIEW_META[view];
+  document.getElementById('topbar-title').textContent = meta[0];
+  document.getElementById('topbar-sub').textContent = meta[1];
+  closeSidebar();
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  ({
+    'org-dashboard': renderOrgDashboard,
+    'org-trainers': renderOrgTrainers,
+    'org-trainees': renderOrgTrainees,
+    'org-locations': renderOrgLocations,
+    'org-training-log': renderOrgTrainingLog,
+    'org-locations-map': renderOrgLocationsMap,
+    'org-materials': renderOrgMaterials,
+    'org-certificates': renderOrgCertificates,
+    'org-payments': renderOrgPayments,
+    'org-correspondence': renderOrgCorrespondence,
+    'org-login-activity': renderOrgLoginActivity,
+    'org-settings': renderOrgSettings,
+    'trainer-dashboard': renderTrainerDashboard,
+    'trainer-trainees': renderTrainerTrainees,
+    'trainer-locations-map': renderTrainerLocationsMap,
+    'trainer-materials': renderTrainerMaterials,
+    'trainer-payments': renderTrainerPayments,
+    'trainer-correspondence': renderTrainerCorrespondence,
+    'trainer-profile': renderTrainerProfile,
+  })[view]();
+  updateBell();
+}
+
+/* ---------------- Modal helpers ---------------- */
+function openModal(title, bodyHtml){
+  document.getElementById('modal-box').innerHTML = `
+    <div class="modal-head"><h3>${title}</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    ${bodyHtml}
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+
+/* ================= ORG DASHBOARD ================= */
+function renderOrgDashboard(){
+  const c = document.getElementById('content');
+  const districtsUsed = new Set(DB.niehubers.flatMap(t=>t.districtIds||[])).size;
+  const parishesUsed = new Set(DB.niehubers.flatMap(t=>t.parishIds||[])).size;
+  const fieldCounts = FIELDS.map(f=>({f, n: DB.niehubees.filter(x=>(x.programs||[]).some(p=>p.field===f)).length}));
+  const maxN = Math.max(1, ...fieldCounts.map(x=>x.n));
+  const recentTrainees = [...DB.niehubees].sort((a,b)=>b.enrollmentDate.localeCompare(a.enrollmentDate)).slice(0,5);
+
+  c.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="n">${DB.niehubers.length}</div><div class="l">Registered NIEHUBers</div></div>
+      <div class="stat-card"><div class="n">${DB.niehubees.length}</div><div class="l">Registered NIEHUBees</div></div>
+      <div class="stat-card"><div class="n">${districtsUsed}</div><div class="l">Districts covered</div></div>
+      <div class="stat-card"><div class="n">${parishesUsed}</div><div class="l">Parishes covered</div></div>
+    </div>
+
+    <div class="card">
+      <h3>NIEHUBees by field of study</h3>
+      ${fieldCounts.map(x=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:140px;font-size:13px;font-weight:600;">${x.f}</div>
+          <div style="flex:1;background:var(--surface-alt);border-radius:6px;height:10px;overflow:hidden;">
+            <div style="width:${(x.n/maxN*100)||0}%;background:var(--primary);height:100%;"></div>
+          </div>
+          <div style="width:26px;text-align:right;font-size:13px;font-weight:700;">${x.n}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Recently enrolled NIEHUBees</h3><button class="btn btn-sm" onclick="navigate('org-trainees')">View all</button></div>
+      ${recentTrainees.length ? `
+      <table><thead><tr><th>Name</th><th>Programmes</th><th>Trainer</th><th>District</th></tr></thead>
+      <tbody>${recentTrainees.map(t=>traineeRow(t)).join('')}</tbody></table>
+      ` : emptyState('No NIEHUBees yet','Trainers can register NIEHUBees from their dashboard.')}
+    </div>
+  `;
+}
+
+function emptyState(title, sub){
+  return `<div class="empty-state"><div class="em-title">${title}</div>${sub}</div>`;
+}
+
+/* ---------------- Text safety + clickable links ---------------- */
+// Escapes user-entered text before it goes into innerHTML, then turns any
+// http(s)/www links inside it into real clickable <a> tags.
+function escapeHtml(str){
+  return String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function linkify(str){
+  const escaped = escapeHtml(str);
+  return escaped.replace(/((https?:\/\/|www\.)[^\s<]+)/g, (match)=>{
+    const href = match.startsWith('http') ? match : 'https://'+match;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+  });
+}
+
+function traineeRow(t){
+  const trainer = DB.niehubers.find(x=>x.id===t.trainerId);
+  const d = DB.districts.find(x=>x.id===t.districtId);
+  return `<tr>
+    <td>${t.name}</td>
+    <td>${programChips(t.programs)}</td>
+    <td>${trainer?trainer.name:'—'}</td>
+    <td>${d?d.name:'—'}</td>
+  </tr>`;
+}
+
+function statusBadge(status){
+  const map = {'Enrolled':'badge-amber','In Training':'badge-green','Graduated':'badge-green','Dropped':'badge-red'};
+  return `<span class="badge ${map[status]||'badge-grey'}">${status}</span>`;
+}
+// A NIEHUBee can now be enrolled in more than one field of study at once,
+// each progressing independently — show one compact chip per programme.
+function programChips(programs){
+  if(!programs || !programs.length) return '<span style="color:var(--ink-soft);font-size:12px;">No programme yet</span>';
+  return programs.map(p => `<span class="badge ${{'Enrolled':'badge-amber','In Training':'badge-green','Graduated':'badge-green','Dropped':'badge-red'}[p.status]||'badge-grey'}" style="margin:2px 4px 2px 0;">${p.field}: ${p.status}</span>`).join('');
+}
+
+/* ================= ORG: NIEHUBers ================= */
+function renderOrgTrainers(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head" style="margin-bottom:14px;">
+      <div class="search-bar" style="margin:0;flex:1;">
+        <input type="text" id="trainer-search" placeholder="Search NIEHUBers by name or phone" oninput="renderTrainerTable()">
+        <select id="trainer-field-filter" onchange="renderTrainerTable()">
+          <option value="">All fields</option>
+          ${FIELDS.map(f=>`<option value="${f}">${f}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="openTrainerForm()">+ Register NIEHUBer</button>
+    </div>
+    <div class="card"><div id="trainer-table-wrap"></div></div>
+  `;
+  renderTrainerTable();
+}
+
+function renderTrainerTable(){
+  const q = (document.getElementById('trainer-search')?.value || '').toLowerCase();
+  const ff = document.getElementById('trainer-field-filter')?.value || '';
+  let list = DB.niehubers.filter(t =>
+    (t.name.toLowerCase().includes(q) || (t.phone||'').includes(q)) &&
+    (!ff || (t.fieldsOfStudy||[]).includes(ff))
+  );
+  document.getElementById('trainer-table-wrap').innerHTML = `
+    <div class="row-actions" style="justify-content:flex-end;margin-bottom:12px;">
+      <button class="btn btn-sm" onclick="exportTrainersCSV()">Export CSV</button>
+      <button class="btn btn-sm" onclick="printPage()">Print</button>
+    </div>
+    ${list.length ? `
+    <table><thead><tr><th></th><th>Name</th><th>Phone</th><th>Fields</th><th>Districts</th><th>Status</th><th></th></tr></thead>
+    <tbody>${list.map(t=>{
+      const dists = (t.districtIds||[]).map(id=>DB.districts.find(d=>d.id===id)?.name).filter(Boolean).join(', ') || '—';
+      return `<tr>
+        <td>${avatarHtml(t.photo, t.name, 'sm')}</td>
+        <td><strong>${t.name}</strong></td>
+        <td>${t.phone||'—'}</td>
+        <td>${(t.fieldsOfStudy||[]).join(', ')||'—'}</td>
+        <td>${dists}</td>
+        <td>${t.status==='active'?'<span class="badge badge-green">Active</span>':'<span class="badge badge-grey">Inactive</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openTrainerForm('${t.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="resetTrainerPassword('${t.id}')">Reset password</button>
+          <button class="btn btn-sm" onclick="toggleTrainerStatus('${t.id}')">${t.status==='active'?'Deactivate':'Activate'}</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : `<div class="empty-row">${emptyState('No NIEHUBers found','Try a different search or register a new one.')}</div>`}
+  `;
+}
+function exportTrainersCSV(){
+  const rows = DB.niehubers.map(t=>[t.name, t.phone, t.email, (t.fieldsOfStudy||[]).join('; '),
+    (t.districtIds||[]).map(id=>DB.districts.find(d=>d.id===id)?.name).filter(Boolean).join('; '),
+    t.status, t.baseSalary||0, t.momoNumber||'']);
+  exportCSV('niehubers.csv', ['Name','Phone','Email','Fields of study','Districts','Status','Base salary (UGX)','Momo number'], rows);
+}
+function resetTrainerPassword(id){
+  const t = DB.niehubers.find(x=>x.id===id);
+  if(!confirm(`Reset ${t.name}'s password to the default (2026)?`)) return;
+  t.password = '2026';
+  persist('niehubers');
+  toast(`Password reset for ${t.name}`);
+}
+
+function toggleTrainerStatus(id){
+  const t = DB.niehubers.find(x=>x.id===id);
+  t.status = t.status==='active' ? 'inactive' : 'active';
+  persist('niehubers'); renderTrainerTable(); toast(`${t.name} marked ${t.status}`);
+}
+
+function openTrainerForm(id){
+  editingTrainerId = id || null;
+  const t = id ? DB.niehubers.find(x=>x.id===id) : null;
+  pick.districtIds = t ? [...(t.districtIds||[])] : [];
+  pick.parishIds = t ? [...(t.parishIds||[])] : [];
+
+  openModal(id ? 'Edit NIEHUBer' : 'Register NIEHUBer', `
+    <form onsubmit="return saveTrainer(event)">
+      <div class="avatar-upload-wrap">
+        <div id="tf-photo-preview-wrap">${avatarHtml(t?t.photo:null, t?t.name:'New', 'lg')}</div>
+        <div>
+          <label class="field-label">Profile picture (optional)</label>
+          <input type="file" accept="image/*" id="tf-photo-input" onchange="handlePhotoInput(this, function(url){ window.__tfPhoto = url; document.getElementById('tf-photo-preview-wrap').innerHTML = avatarHtml(url, document.getElementById('tf-name').value, 'lg'); })">
+          ${t && t.photo ? `<button type="button" class="btn btn-sm btn-danger" style="margin-left:6px;" onclick="window.__tfPhoto=null; document.getElementById('tf-photo-preview-wrap').innerHTML=avatarHtml(null, document.getElementById('tf-name').value, 'lg');">Remove</button>` : ''}
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full"><label>Full name</label><input required id="tf-name" value="${t?t.name:''}"></div>
+        <div class="form-group"><label>Phone number</label><input required id="tf-phone" value="${t?t.phone||'':''}"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="tf-email" value="${t?t.email||'':''}"></div>
+        <div class="form-group"><label>Gender</label>
+          <select id="tf-gender"><option ${t?.gender==='Male'?'selected':''}>Male</option><option ${t?.gender==='Female'?'selected':''}>Female</option></select>
+        </div>
+        <div class="form-group"><label>Base salary (UGX / month)</label><input type="number" min="0" id="tf-salary" value="${t?t.baseSalary||0:0}"></div>
+        <div class="form-group full">
+          <label>Fields of study taught</label>
+          <div class="checklist">
+            ${FIELDS.map(f=>`<label><input type="checkbox" value="${f}" class="tf-field" ${t && (t.fieldsOfStudy||[]).includes(f)?'checked':''}> ${f}</label>`).join('')}
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Duty stations — districts &amp; parishes</label>
+          <div class="checklist" id="tf-location-picker">${renderLocationPicker()}</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">${id?'Save changes':'Register NIEHUBer'}</button>
+      </div>
+    </form>
+  `);
+  window.__tfPhoto = t && t.photo ? t.photo : null;
+}
+
+function renderLocationPicker(){
+  return DB.districts.map(d=>{
+    const checked = pick.districtIds.includes(d.id);
+    const parishes = DB.parishes.filter(p=>p.districtId===d.id);
+    return `
+      <label><input type="checkbox" onchange="pickDistrict('${d.id}', this.checked)" ${checked?'checked':''}> ${d.name}</label>
+      ${checked && parishes.length ? `<div class="parish-sub">${parishes.map(p=>`
+        <label><input type="checkbox" onchange="pickParish('${p.id}', this.checked)" ${pick.parishIds.includes(p.id)?'checked':''}> ${p.name}</label>
+      `).join('')}</div>` : ''}
+    `;
+  }).join('') || '<div style="font-size:13px;color:var(--ink-soft);">No districts yet — add some under Districts &amp; Parishes.</div>';
+}
+function pickDistrict(id, checked){
+  if(checked){ if(!pick.districtIds.includes(id)) pick.districtIds.push(id); }
+  else { pick.districtIds = pick.districtIds.filter(x=>x!==id); pick.parishIds = pick.parishIds.filter(pid => DB.parishes.find(p=>p.id===pid)?.districtId !== id); }
+  document.getElementById('tf-location-picker').innerHTML = renderLocationPicker();
+}
+function pickParish(id, checked){
+  if(checked){ if(!pick.parishIds.includes(id)) pick.parishIds.push(id); }
+  else{ pick.parishIds = pick.parishIds.filter(x=>x!==id); }
+}
+
+function saveTrainer(e){
+  e.preventDefault();
+  const fields = [...document.querySelectorAll('.tf-field:checked')].map(x=>x.value);
+  const data = {
+    name: document.getElementById('tf-name').value.trim(),
+    phone: document.getElementById('tf-phone').value.trim(),
+    email: document.getElementById('tf-email').value.trim(),
+    gender: document.getElementById('tf-gender').value,
+    baseSalary: Number(document.getElementById('tf-salary').value)||0,
+    fieldsOfStudy: fields,
+    districtIds: [...pick.districtIds],
+    parishIds: [...pick.parishIds],
+    photo: window.__tfPhoto || null,
+  };
+  if(editingTrainerId){
+    const t = DB.niehubers.find(x=>x.id===editingTrainerId);
+    Object.assign(t, data);
+    toast('NIEHUBer updated');
+  } else {
+    DB.niehubers.push({
+      id: uid('tr'), ...data, status:'active', dateJoined: new Date().toISOString().slice(0,10),
+      momoNumber:'', momoName:'', password:'2026',
+      benefits: { trainingAllowance:{on:false,amount:0}, airtime:{on:false,amount:0}, dataBundle:{on:false,amount:0} }
+    });
+    toast('NIEHUBer registered — default password is 2026');
+  }
+  persist('niehubers');
+  closeModal();
+  renderTrainerTable();
+  return false;
+}
+
+/* ================= ORG: Districts & Parishes ================= */
+function renderOrgLocations(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Districts</h3><button class="btn btn-primary btn-sm" onclick="openDistrictForm()">+ Add district</button></div>
+    <div class="card" id="districts-wrap"></div>
+  `;
+  renderDistrictsWrap();
+}
+function renderDistrictsWrap(){
+  const wrap = document.getElementById('districts-wrap');
+  wrap.innerHTML = DB.districts.length ? DB.districts.map(d=>{
+    const parishes = DB.parishes.filter(p=>p.districtId===d.id);
+    const trainerCount = DB.niehubers.filter(t=>(t.districtIds||[]).includes(d.id)).length;
+    return `
+      <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><strong>${d.name}</strong> <span style="color:var(--ink-soft);font-size:12.5px;"> · ${parishes.length} parishes · ${trainerCount} NIEHUBers</span></div>
+          <button class="btn btn-sm" onclick="openParishForm('${d.id}')">+ Add parish</button>
+        </div>
+        ${parishes.length ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${parishes.map(p=>`<span class="badge badge-grey">${p.name}</span>`).join('')}</div>` : ''}
+      </div>
+    `;
+  }).join('') : emptyState('No districts yet','Add your first district to get started.');
+}
+function openDistrictForm(){
+  openModal('Add District', `
+    <form onsubmit="return saveDistrict(event)">
+      <div class="form-group full"><label>District name</label><input required id="df-name"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Add district</button></div>
+    </form>
+  `);
+}
+function saveDistrict(e){
+  e.preventDefault();
+  const name = document.getElementById('df-name').value.trim();
+  if(name){ DB.districts.push({id:uid('dist'), name}); persist('districts'); toast('District added'); }
+  closeModal(); renderDistrictsWrap();
+  return false;
+}
+function openParishForm(districtId){
+  const d = DB.districts.find(x=>x.id===districtId);
+  openModal(`Add Parish — ${d.name}`, `
+    <form onsubmit="return saveParish(event,'${districtId}')">
+      <div class="form-group full"><label>Parish name</label><input required id="pf-name"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Add parish</button></div>
+    </form>
+  `);
+}
+function saveParish(e, districtId){
+  e.preventDefault();
+  const name = document.getElementById('pf-name').value.trim();
+  if(name){ DB.parishes.push({id:uid('par'), name, districtId}); persist('parishes'); toast('Parish added'); }
+  closeModal(); renderDistrictsWrap();
+  return false;
+}
+
+/* ================= ORG: NIEHUBees ================= */
+function renderOrgTrainees(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head" style="margin-bottom:14px;">
+      <div class="search-bar" style="margin:0;flex:1;">
+        <input type="text" id="tn-search" placeholder="Search by name or phone" oninput="renderTraineeTable()">
+        <select id="tn-field" onchange="renderTraineeTable()"><option value="">All fields</option>${FIELDS.map(f=>`<option>${f}</option>`).join('')}</select>
+        <select id="tn-status" onchange="renderTraineeTable()"><option value="">All statuses</option><option>Enrolled</option><option>In Training</option><option>Graduated</option><option>Dropped</option></select>
+        <select id="tn-trainer" onchange="renderTraineeTable()"><option value="">All NIEHUBers</option>${DB.niehubers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select>
+      </div>
+      <button class="btn btn-primary" onclick="openTraineeForm(null,true)">+ Register NIEHUBee</button>
+    </div>
+    <div class="card"><div id="trainee-table-wrap"></div></div>
+  `;
+  renderTraineeTable();
+}
+function renderTraineeTable(){
+  const q = (document.getElementById('tn-search')?.value||'').toLowerCase();
+  const field = document.getElementById('tn-field')?.value||'';
+  const status = document.getElementById('tn-status')?.value||'';
+  const trainerId = document.getElementById('tn-trainer')?.value||'';
+  let list = DB.niehubees.filter(t =>
+    (t.name.toLowerCase().includes(q) || (t.phone||'').includes(q)) &&
+    (!field || (t.programs||[]).some(p=>p.field===field)) &&
+    (!status || (t.programs||[]).some(p=>p.status===status)) &&
+    (!trainerId || t.trainerId===trainerId)
+  );
+  document.getElementById('trainee-table-wrap').innerHTML = `
+    <div class="row-actions" style="justify-content:flex-end;margin-bottom:12px;">
+      <button class="btn btn-sm" onclick="exportTraineesCSV()">Export CSV</button>
+      <button class="btn btn-sm" onclick="printPage()">Print</button>
+    </div>
+    ${list.length ? `
+    <table><thead><tr><th></th><th>Name</th><th>Programmes</th><th>Trainer</th><th>District / Parish</th><th></th></tr></thead>
+    <tbody>${list.map(t=>{
+      const trainer = DB.niehubers.find(x=>x.id===t.trainerId);
+      const d = DB.districts.find(x=>x.id===t.districtId);
+      const p = DB.parishes.find(x=>x.id===t.parishId);
+      const hasGraduated = (t.programs||[]).some(pr=>pr.status==='Graduated');
+      return `<tr>
+        <td>${avatarHtml(t.photo, t.name, 'xs')}</td>
+        <td>${t.name}</td>
+        <td>${programChips(t.programs)}</td>
+        <td>${trainer?trainer.name:'Unassigned'}</td>
+        <td>${d?d.name:'—'}${p?', '+p.name:''}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openTraineeForm('${t.id}',true)">Edit</button>
+          ${hasGraduated ? `<button class="btn btn-sm" onclick="openCertificate('${t.id}')">Certificate</button>` : ''}
+          <button class="btn btn-sm btn-danger" onclick="deleteTrainee('${t.id}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : `<div class="empty-row">${emptyState('No NIEHUBees found','Adjust filters, or register a NIEHUBee directly.')}</div>`}
+  `;
+}
+function exportTraineesCSV(){
+  const rows = DB.niehubees.map(t=>{
+    const trainer = DB.niehubers.find(x=>x.id===t.trainerId);
+    const d = DB.districts.find(x=>x.id===t.districtId);
+    const p = DB.parishes.find(x=>x.id===t.parishId);
+    const progs = (t.programs||[]).map(pr=>`${pr.field}: ${pr.status}`).join('; ');
+    return [t.name, t.phone, t.gender, t.age, progs, trainer?trainer.name:'Unassigned', d?d.name:'', p?p.name:'', t.enrollmentDate];
+  });
+  exportCSV('niehubees.csv', ['Name','Phone','Gender','Age','Programmes','Trainer','District','Parish','Enrollment date'], rows);
+}
+function deleteTrainee(id){
+  const t = DB.niehubees.find(x=>x.id===id);
+  if(!confirm(`Remove ${t.name} from NIEHUBees? This cannot be undone.`)) return;
+  DB.niehubees = DB.niehubees.filter(x=>x.id!==id);
+  persist('niehubees'); renderTraineeTable(); toast('NIEHUBee removed');
+}
+/* ================= ORG: Payments (full finance access — NIEHUBers + Other team members) ================= */
+function renderOrgPayments(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="tabs">
+      <div class="tab active" id="tab-benefits" onclick="switchPayTab('benefits')">NIEHUBer Pay & Benefits</div>
+      <div class="tab" id="tab-others" onclick="switchPayTab('others')">Other Team Members</div>
+      <div class="tab" id="tab-history" onclick="switchPayTab('history')">Payment History</div>
+    </div>
+    <div id="pay-tab-content"></div>
+  `;
+  switchPayTab('benefits');
+}
+function switchPayTab(tab){
+  document.getElementById('tab-benefits').classList.toggle('active', tab==='benefits');
+  document.getElementById('tab-others').classList.toggle('active', tab==='others');
+  document.getElementById('tab-history').classList.toggle('active', tab==='history');
+  const wrap = document.getElementById('pay-tab-content');
+  if(tab==='benefits'){
+    wrap.innerHTML = `<div class="card"><div id="benefits-table-wrap"></div></div>`;
+    renderBenefitsTable();
+  } else if(tab==='others'){
+    wrap.innerHTML = `
+      <div class="card-head"><h3 style="margin:0;">Other team members</h3><button class="btn btn-primary btn-sm" onclick="openOtherPayeeForm()">+ Add team member</button></div>
+      <div class="card"><div id="others-table-wrap"></div></div>
+    `;
+    renderOtherPayeesTable();
+  } else {
+    const rows = [...DB.payments].sort((a,b)=>b.date.localeCompare(a.date));
+    wrap.innerHTML = `
+      <div class="row-actions" style="justify-content:flex-end;margin-bottom:12px;">
+        <button class="btn btn-sm" onclick="exportPaymentsCSV()">Export CSV</button>
+        <button class="btn btn-sm" onclick="printPage()">Print</button>
+      </div>
+      <div class="card">${rows.length ? `
+      <table><thead><tr><th>Date</th><th>Recipient</th><th>Role</th><th>Type</th><th>Amount (UGX)</th><th>Status</th></tr></thead>
+      <tbody>${rows.map(p=>{
+        const label = payeeLabel(p.payeeType, p.payeeId);
+        return `<tr><td>${p.date}</td><td>${label.name}</td><td>${label.role}</td><td>${p.type}</td><td>${p.amount.toLocaleString()}</td><td>${p.status==='Paid'?'<span class="badge badge-green">Paid</span>':'<span class="badge badge-amber">Pending</span>'}</td></tr>`;
+      }).join('')}</tbody></table>` : emptyState('No payment records yet','Record a payment from the Pay & Benefits tabs.')}</div>`;
+  }
+}
+function exportPaymentsCSV(){
+  const rows = [...DB.payments].sort((a,b)=>b.date.localeCompare(a.date)).map(p=>{
+    const label = payeeLabel(p.payeeType, p.payeeId);
+    return [p.date, label.name, label.role, p.type, p.amount, p.status];
+  });
+  exportCSV('payment-history.csv', ['Date','Recipient','Role','Type','Amount (UGX)','Status'], rows);
+}
+function payeeLabel(payeeType, payeeId){
+  if(payeeType==='other'){
+    const o = DB.otherPayees.find(x=>x.id===payeeId);
+    return { name: o?o.name:'—', role: o?o.role:'Other' };
+  }
+  const t = DB.niehubers.find(x=>x.id===payeeId);
+  return { name: t?t.name:'—', role: 'NIEHUBer' };
+}
+function renderBenefitsTable(){
+  document.getElementById('benefits-table-wrap').innerHTML = DB.niehubers.length ? `
+    <table><thead><tr><th>NIEHUBer</th><th>Base salary</th><th>Training allowance</th><th>Airtime</th><th>Data bundle</th><th>Momo account</th><th></th></tr></thead>
+    <tbody>${DB.niehubers.map(t=>{
+      const b = t.benefits || {trainingAllowance:{on:false,amount:0},airtime:{on:false,amount:0},dataBundle:{on:false,amount:0}};
+      return `<tr>
+        <td><strong>${t.name}</strong></td>
+        <td>${t.baseSalary?t.baseSalary.toLocaleString():'—'}</td>
+        <td>${b.trainingAllowance.on ? 'UGX '+b.trainingAllowance.amount.toLocaleString() : '<span class="badge badge-grey">Off</span>'}</td>
+        <td>${b.airtime.on ? 'UGX '+b.airtime.amount.toLocaleString() : '<span class="badge badge-grey">Off</span>'}</td>
+        <td>${b.dataBundle.on ? 'UGX '+b.dataBundle.amount.toLocaleString() : '<span class="badge badge-grey">Off</span>'}</td>
+        <td>${t.momoNumber ? (t.momoName||'')+' · '+t.momoNumber : '<span class="badge badge-grey">Not set</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openBenefitsForm('${t.id}')">Edit benefits</button>
+          <button class="btn btn-sm" onclick="openMomoFormFor('trainer','${t.id}')">Payment account</button>
+          <button class="btn btn-sm btn-primary" onclick="openRecordPayment('trainer','${t.id}')">Record payment</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : emptyState('No NIEHUBers registered yet','Register NIEHUBers to manage their pay.');
+}
+function openBenefitsForm(trainerId){
+  const t = DB.niehubers.find(x=>x.id===trainerId);
+  const b = t.benefits;
+  openModal(`Benefits — ${t.name}`, `
+    <form onsubmit="return saveBenefits(event,'${trainerId}')">
+      <div class="benefit-row"><div class="benefit-name">Training allowance<small>Paid per training session/cycle</small></div>
+        <label class="toggle"><input type="checkbox" id="b-ta-on" ${b.trainingAllowance.on?'checked':''}><span class="track"></span></label></div>
+      <div class="form-group" style="margin:8px 0 14px;"><label>Amount (UGX)</label><input type="number" min="0" id="b-ta-amt" value="${b.trainingAllowance.amount}"></div>
+      <div class="benefit-row"><div class="benefit-name">Airtime<small>Monthly airtime benefit</small></div>
+        <label class="toggle"><input type="checkbox" id="b-air-on" ${b.airtime.on?'checked':''}><span class="track"></span></label></div>
+      <div class="form-group" style="margin:8px 0 14px;"><label>Amount (UGX)</label><input type="number" min="0" id="b-air-amt" value="${b.airtime.amount}"></div>
+      <div class="benefit-row"><div class="benefit-name">Data bundle<small>Monthly internet data benefit</small></div>
+        <label class="toggle"><input type="checkbox" id="b-data-on" ${b.dataBundle.on?'checked':''}><span class="track"></span></label></div>
+      <div class="form-group" style="margin:8px 0 4px;"><label>Amount (UGX)</label><input type="number" min="0" id="b-data-amt" value="${b.dataBundle.amount}"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save benefits</button></div>
+    </form>
+  `);
+}
+function saveBenefits(e, trainerId){
+  e.preventDefault();
+  const t = DB.niehubers.find(x=>x.id===trainerId);
+  t.benefits = {
+    trainingAllowance:{on:document.getElementById('b-ta-on').checked, amount:Number(document.getElementById('b-ta-amt').value)||0},
+    airtime:{on:document.getElementById('b-air-on').checked, amount:Number(document.getElementById('b-air-amt').value)||0},
+    dataBundle:{on:document.getElementById('b-data-on').checked, amount:Number(document.getElementById('b-data-amt').value)||0},
+  };
+  persist('niehubers'); closeModal(); renderBenefitsTable(); toast('Benefits updated');
+  return false;
+}
+
+/* --- Other team members (finance access for staff outside the NIEHUBer role) --- */
+function renderOtherPayeesTable(){
+  document.getElementById('others-table-wrap').innerHTML = DB.otherPayees.length ? `
+    <table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Momo account</th><th></th></tr></thead>
+    <tbody>${DB.otherPayees.map(o=>`
+      <tr>
+        <td><strong>${o.name}</strong></td>
+        <td>${o.role||'—'}</td>
+        <td>${o.phone||'—'}</td>
+        <td>${o.momoNumber ? (o.momoName||'')+' · '+o.momoNumber : '<span class="badge badge-grey">Not set</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" onclick="openOtherPayeeForm('${o.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="openMomoFormFor('other','${o.id}')">Payment account</button>
+          <button class="btn btn-sm btn-primary" onclick="openRecordPayment('other','${o.id}')">Record payment</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteOtherPayee('${o.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('')}</tbody></table>
+  ` : emptyState('No other team members yet','Add staff outside the NIEHUBer role — e.g. drivers, admin, field officers — to manage their pay here too.');
+}
+function openOtherPayeeForm(id){
+  const o = id ? DB.otherPayees.find(x=>x.id===id) : null;
+  openModal(id ? 'Edit Team Member' : 'Add Team Member', `
+    <form onsubmit="return saveOtherPayee(event, ${id?`'${id}'`:'null'})">
+      <div class="form-grid">
+        <div class="form-group full"><label>Full name</label><input required id="op-name" value="${o?o.name:''}"></div>
+        <div class="form-group"><label>Role / position</label><input id="op-role" placeholder="e.g. Field Officer, Driver, Admin" value="${o?o.role||'':''}"></div>
+        <div class="form-group"><label>Phone number</label><input id="op-phone" value="${o?o.phone||'':''}"></div>
+        <div class="form-group full"><label>Base salary (UGX / month)</label><input type="number" min="0" id="op-salary" value="${o?o.baseSalary||0:0}"></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">${id?'Save changes':'Add team member'}</button></div>
+    </form>
+  `);
+}
+function saveOtherPayee(e, id){
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('op-name').value.trim(),
+    role: document.getElementById('op-role').value.trim(),
+    phone: document.getElementById('op-phone').value.trim(),
+    baseSalary: Number(document.getElementById('op-salary').value)||0,
+  };
+  if(id){ Object.assign(DB.otherPayees.find(x=>x.id===id), data); toast('Team member updated'); }
+  else { DB.otherPayees.push({ id: uid('op'), ...data, momoNumber:'', momoName:'' }); toast('Team member added'); }
+  persist('otherPayees'); closeModal(); renderOtherPayeesTable();
+  return false;
+}
+function deleteOtherPayee(id){
+  const o = DB.otherPayees.find(x=>x.id===id);
+  if(!confirm(`Remove ${o.name} from team members?`)) return;
+  DB.otherPayees = DB.otherPayees.filter(x=>x.id!==id);
+  persist('otherPayees'); renderOtherPayeesTable(); toast('Team member removed');
+}
+
+/* --- Mobile Money account: organization can set this up for any NIEHUBer or team member --- */
+function openMomoFormFor(payeeType, payeeId){
+  const rec = payeeType==='other' ? DB.otherPayees.find(x=>x.id===payeeId) : DB.niehubers.find(x=>x.id===payeeId);
+  openModal(`Mobile Money Account — ${rec.name}`, `
+    <form onsubmit="return saveMomoFor(event, '${payeeType}', '${payeeId}')">
+      <div class="form-group full"><label>Account name</label><input required id="mm-name" value="${rec.momoName||''}"></div>
+      <div class="form-group full" style="margin-top:12px;"><label>Mobile Money phone number</label><input required id="mm-phone" value="${rec.momoNumber||''}"></div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save account</button></div>
+    </form>
+  `);
+}
+function saveMomoFor(e, payeeType, payeeId){
+  e.preventDefault();
+  const rec = payeeType==='other' ? DB.otherPayees.find(x=>x.id===payeeId) : DB.niehubers.find(x=>x.id===payeeId);
+  rec.momoName = document.getElementById('mm-name').value.trim();
+  rec.momoNumber = document.getElementById('mm-phone').value.trim();
+  persist(payeeType==='other' ? 'otherPayees' : 'niehubers');
+  closeModal();
+  if(session.role==='trainer') renderTrainerPayments();
+  else if(payeeType==='other') renderOtherPayeesTable();
+  else renderBenefitsTable();
+  toast('Mobile Money account saved');
+  return false;
+}
+
+/* --- Record a payment for a NIEHUBer or another team member --- */
+function openRecordPayment(payeeType, payeeId){
+  const rec = payeeType==='other' ? DB.otherPayees.find(x=>x.id===payeeId) : DB.niehubers.find(x=>x.id===payeeId);
+  openModal(`Record Payment — ${rec.name}`, `
+    <form onsubmit="return savePayment(event,'${payeeType}','${payeeId}')">
+      <div class="form-grid">
+        <div class="form-group full"><label>Type</label>
+          <select id="pf-type"><option>Salary</option><option>Training Allowance</option><option>Airtime</option><option>Data Bundle</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label>Amount (UGX)</label><input type="number" min="0" required id="pf-amount" value="${rec.baseSalary||0}"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="pf-date" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="form-group full"><label>Status</label>
+          <select id="pf-status"><option>Paid</option><option>Pending</option></select>
+        </div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save payment</button></div>
+    </form>
+  `);
+}
+function savePayment(e, payeeType, payeeId){
+  e.preventDefault();
+  DB.payments.push({
+    id: uid('pay'), payeeType, payeeId,
+    type: document.getElementById('pf-type').value,
+    amount: Number(document.getElementById('pf-amount').value)||0,
+    date: document.getElementById('pf-date').value,
+    status: document.getElementById('pf-status').value,
+  });
+  persist('payments'); closeModal(); switchPayTab('history'); toast('Payment recorded');
+  return false;
+}
+
+/* ================= ORG: Correspondence ================= */
+function renderOrgCorrespondence(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Messages</h3><button class="btn btn-primary btn-sm" onclick="openComposeForm('org')">+ New message</button></div>
+    <div class="card" id="msg-wrap"></div>
+  `;
+  renderMessages('org');
+  markMessagesReadForViewer('org');
+}
+function renderMessages(viewer){
+  const wrap = document.getElementById('msg-wrap');
+  let list;
+  if(viewer==='org') list = DB.messages;
+  else list = DB.messages.filter(m => m.to===viewer || m.to==='ALL' || m.from===viewer);
+  list = [...list].sort((a,b)=>b.date.localeCompare(a.date));
+  window.__msgViewer = viewer;
+  wrap.innerHTML = list.length ? list.map(m=>{
+    const fromLabel = m.from==='org' ? 'Organization' : (DB.niehubers.find(t=>t.id===m.from)?.name || 'NIEHUBer');
+    const toLabel = m.to==='org' ? 'Organization' : m.to==='ALL' ? 'All NIEHUBers' : (DB.niehubers.find(t=>t.id===m.to)?.name || 'NIEHUBer');
+    const isUnread = viewer && (m.to===viewer || m.to==='ALL') && m.from!==viewer && !(m.readBy||[]).includes(viewer);
+    return `<div class="msg-item ${isUnread?'msg-unread':''}" style="cursor:pointer;" onclick="openMessageView('${m.id}')">
+      <div class="msg-top"><span>${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}</span><span>${m.date}</span></div>
+      <div class="msg-subject">${escapeHtml(m.subject)}</div>
+      <div class="msg-body" style="max-height:40px;overflow:hidden;">${linkify(m.body)}</div>
+      ${m.attachment ? `<div style="margin-top:6px;font-size:12px;color:var(--ink-soft);">📎 ${escapeHtml(m.attachment.name)}</div>` : ''}
+      </div>`;
+  }).join('') : emptyState('No messages yet','Send an announcement or message to get started.');
+}
+function openMessageView(id){
+  const m = DB.messages.find(x=>x.id===id);
+  const viewer = window.__msgViewer;
+  const fromLabel = m.from==='org' ? 'Organization' : (DB.niehubers.find(t=>t.id===m.from)?.name || 'NIEHUBer');
+  const toLabel = m.to==='org' ? 'Organization' : m.to==='ALL' ? 'All NIEHUBers' : (DB.niehubers.find(t=>t.id===m.to)?.name || 'NIEHUBer');
+  const canReply = m.from !== viewer; // no point replying to your own message
+  const replyTarget = m.from === 'org' ? null : m.from; // who to reply TO
+  openModal(escapeHtml(m.subject), `
+    <div class="msg-top" style="margin-bottom:10px;"><span>${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}</span><span>${m.date}</span></div>
+    <div class="msg-body" style="font-size:14px;line-height:1.6;">${linkify(m.body)}</div>
+    ${m.attachment ? `<button class="btn btn-sm" style="margin-top:12px;" onclick="downloadDataUrl('${m.attachment.data}','${(m.attachment.name||'file').replace(/'/g,"")}')">📎 Download ${escapeHtml(m.attachment.name)}</button>` : ''}
+    <div class="modal-actions">
+      <button type="button" class="btn" onclick="closeModal()">Close</button>
+      ${canReply ? `<button type="button" class="btn btn-primary" onclick="replyToMessage('${m.id}')">Reply</button>` : ''}
+    </div>
+  `);
+}
+function replyToMessage(id){
+  const m = DB.messages.find(x=>x.id===id);
+  const fromRole = session.role==='org' ? 'org' : 'trainer';
+  const replyTo = m.from==='org' ? 'org' : m.from;
+  openComposeForm(fromRole, { to: replyTo, subject: 'Re: '+m.subject, parentId: m.id });
+}
+function openComposeForm(fromRole, prefill){
+  const isOrg = fromRole==='org';
+  const toOptions = isOrg
+    ? `<option value="ALL">All NIEHUBers</option>${DB.niehubers.map(t=>`<option value="${t.id}" ${prefill&&prefill.to===t.id?'selected':''}>${t.name}</option>`).join('')}`
+    : `<option value="org">Organization</option>`;
+  openModal(prefill ? 'Reply' : 'New Message', `
+    <form onsubmit="return sendMessage(event,'${fromRole}', ${prefill&&prefill.parentId?`'${prefill.parentId}'`:'null'})">
+      <div class="form-grid">
+        <div class="form-group full"><label>To</label><select id="mf-to">${toOptions}</select></div>
+        <div class="form-group full"><label>Subject</label><input required id="mf-subject" value="${prefill?escapeHtml(prefill.subject):''}"></div>
+        <div class="form-group full"><label>Message</label><textarea required id="mf-body" rows="4"></textarea></div>
+        <div class="form-group full"><label>Attach a small file (optional, under 500KB)</label><input type="file" id="mf-file"></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Send</button></div>
+    </form>
+  `);
+}
+function sendMessage(e, fromRole, parentId){
+  e.preventDefault();
+  const from = fromRole==='org' ? 'org' : session.trainerId;
+  const finish = (attachment) => {
+    DB.messages.push({
+      id: uid('msg'), from, to: document.getElementById('mf-to').value,
+      subject: document.getElementById('mf-subject').value.trim(),
+      body: document.getElementById('mf-body').value.trim(),
+      date: new Date().toISOString().slice(0,10), readBy:[from],
+      attachment: attachment || null, parentId: parentId || null
+    });
+    persist('messages'); closeModal();
+    if(fromRole==='org') renderMessages('org'); else renderMessages(session.trainerId);
+    updateBell();
+    toast('Message sent');
+  };
+  const fileInput = document.getElementById('mf-file');
+  if(fileInput.files && fileInput.files[0]){
+    handleFileInput(fileInput, 500, (res)=> finish({ name: res.name, data: res.data }));
+  } else {
+    finish(null);
+  }
+  return false;
+}
+
+/* ================= TRAINER: Dashboard ================= */
+function renderTrainerDashboard(){
+  const t = currentTrainer();
+  const mine = DB.niehubees.filter(x=>x.trainerId===t.id);
+  const c = document.getElementById('content');
+  const dists = (t.districtIds||[]).map(id=>DB.districts.find(d=>d.id===id)?.name).filter(Boolean);
+  const parishes = (t.parishIds||[]).map(id=>DB.parishes.find(p=>p.id===id)?.name).filter(Boolean);
+  const fieldCounts = FIELDS.map(f=>({f, n: mine.filter(x=>(x.programs||[]).some(p=>p.field===f)).length}));
+  const maxN = Math.max(1, ...fieldCounts.map(x=>x.n));
+
+  c.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="n">${mine.length}</div><div class="l">My NIEHUBees</div></div>
+      <div class="stat-card"><div class="n">${dists.length}</div><div class="l">Assigned districts</div></div>
+      <div class="stat-card"><div class="n">${parishes.length}</div><div class="l">Assigned parishes</div></div>
+      <div class="stat-card"><div class="n">${DB.payments.filter(p=>p.payeeType==='trainer' && p.payeeId===t.id && p.status==='Pending').length}</div><div class="l">Pending payments</div></div>
+    </div>
+    <div class="card"><div id="checkin-widget"></div></div>
+    <div class="card">
+      <h3>My duty stations</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${dists.length ? dists.map(d=>`<span class="badge badge-green">${d}</span>`).join('') : '<span style="color:var(--ink-soft);font-size:13px;">None assigned yet — contact the organization.</span>'}
+        ${parishes.map(p=>`<span class="badge badge-grey">${p}</span>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3>My NIEHUBees by field of study</h3>
+      ${fieldCounts.map(x=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:140px;font-size:13px;font-weight:600;">${x.f}</div>
+          <div style="flex:1;background:var(--surface-alt);border-radius:6px;height:10px;overflow:hidden;"><div style="width:${(x.n/maxN*100)||0}%;background:var(--primary);height:100%;"></div></div>
+          <div style="width:26px;text-align:right;font-size:13px;font-weight:700;">${x.n}</div>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-head"><h3 style="margin:0;">My recent training sessions</h3><button class="btn btn-sm" onclick="exportMySessionsCSV()">Export CSV</button></div>
+      <div id="my-sessions-wrap"></div>
+    </div>
+  `;
+  renderCheckinWidget();
+  renderMySessionsTable();
+}
+function renderCheckinWidget(){
+  const t = currentTrainer();
+  const active = DB.trainingSessions.find(s=>s.trainerId===t.id && !s.checkOut);
+  const wrap = document.getElementById('checkin-widget');
+  if(!wrap) return;
+  if(active){
+    const started = new Date(active.checkIn);
+    wrap.innerHTML = `
+      <h3 style="margin-bottom:6px;">Training session in progress</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 14px;">Checked in for <strong>${active.fieldOfStudy}</strong> at ${started.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} on ${started.toLocaleDateString()}.</p>
+      <button class="btn btn-primary" onclick="checkOutTraining('${active.id}')">Check Out</button>
+    `;
+  } else {
+    wrap.innerHTML = `
+      <h3 style="margin-bottom:6px;">Start a training session</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 14px;">Check in when you begin training so the organization can see how long each session runs.</p>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group"><label>Field of study</label><select id="ci-field">${FIELDS.map(f=>`<option>${f}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Note (optional)</label><input id="ci-note" placeholder="e.g. Group of 12 at Bulenga site"></div>
+      </div>
+      <button class="btn btn-primary" onclick="checkInTraining()">Check In</button>
+    `;
+  }
+}
+function checkInTraining(){
+  const t = currentTrainer();
+  const btn = document.querySelector('#checkin-widget .btn-primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Getting your location…'; }
+  const finish = (coords) => {
+    DB.trainingSessions.push({
+      id: uid('ses'), trainerId: t.id,
+      fieldOfStudy: document.getElementById('ci-field').value,
+      note: document.getElementById('ci-note').value.trim(),
+      checkIn: new Date().toISOString(), checkOut: null, durationMinutes: null,
+      lat: coords ? coords.lat : null, lng: coords ? coords.lng : null, gpsAccuracy: coords ? coords.accuracy : null
+    });
+    persist('trainingSessions'); renderCheckinWidget(); renderMySessionsTable();
+    toast(coords ? 'Checked in with GPS location' : 'Checked in (location not captured)');
+  };
+  if('geolocation' in navigator){
+    navigator.geolocation.getCurrentPosition(
+      pos => finish({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }),
+      () => finish(null), // denied, unavailable, or timed out — still check in without GPS
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  } else {
+    finish(null);
+  }
+}
+function checkOutTraining(id){
+  const s = DB.trainingSessions.find(x=>x.id===id);
+  s.checkOut = new Date().toISOString();
+  s.durationMinutes = Math.round((new Date(s.checkOut) - new Date(s.checkIn))/60000);
+  persist('trainingSessions'); renderCheckinWidget(); renderMySessionsTable(); toast('Checked out — session logged');
+}
+function renderMySessionsTable(){
+  const t = currentTrainer();
+  const wrap = document.getElementById('my-sessions-wrap');
+  if(!wrap) return;
+  const rows = DB.trainingSessions.filter(s=>s.trainerId===t.id).sort((a,b)=>b.checkIn.localeCompare(a.checkIn)).slice(0,15);
+  wrap.innerHTML = rows.length ? `
+    <table><thead><tr><th>Date</th><th>Field</th><th>Check-in</th><th>Check-out</th><th>Duration</th></tr></thead>
+    <tbody>${rows.map(s=>`<tr>
+      <td>${new Date(s.checkIn).toLocaleDateString()}</td>
+      <td>${s.fieldOfStudy}</td>
+      <td>${new Date(s.checkIn).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</td>
+      <td>${s.checkOut ? new Date(s.checkOut).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '<span class="badge badge-amber">Active</span>'}</td>
+      <td>${s.durationMinutes!=null ? formatDuration(s.durationMinutes) : '—'}</td>
+    </tr>`).join('')}</tbody></table>
+  ` : emptyState('No training sessions logged yet','Use Check In above when you start a training session.');
+}
+function formatDuration(mins){
+  const h = Math.floor(mins/60), m = mins%60;
+  return h>0 ? `${h}h ${m}m` : `${m}m`;
+}
+function exportMySessionsCSV(){
+  const t = currentTrainer();
+  const rows = DB.trainingSessions.filter(s=>s.trainerId===t.id).map(s=>[
+    new Date(s.checkIn).toLocaleDateString(), s.fieldOfStudy, s.checkIn, s.checkOut||'', s.durationMinutes!=null?formatDuration(s.durationMinutes):'', s.note||''
+  ]);
+  exportCSV('my-training-sessions.csv', ['Date','Field of study','Check-in','Check-out','Duration','Note'], rows);
+}
+
+/* ================= TRAINER: My NIEHUBees ================= */
+function renderTrainerTrainees(){
+  const t = currentTrainer();
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">My NIEHUBees</h3><button class="btn btn-primary btn-sm" onclick="openTraineeForm(null,false)">+ Register NIEHUBee</button></div>
+    <div class="card"><div id="my-trainee-wrap"></div></div>
+  `;
+  renderMyTraineeTable();
+}
+function renderMyTraineeTable(){
+  const t = currentTrainer();
+  const mine = DB.niehubees.filter(x=>x.trainerId===t.id);
+  document.getElementById('my-trainee-wrap').innerHTML = mine.length ? `
+    <table><thead><tr><th></th><th>Name</th><th>Programmes</th><th>District/Parish</th><th></th></tr></thead>
+    <tbody>${mine.map(x=>{
+      const d = DB.districts.find(dd=>dd.id===x.districtId);
+      const p = DB.parishes.find(pp=>pp.id===x.parishId);
+      const hasGraduated = (x.programs||[]).some(pr=>pr.status==='Graduated');
+      return `<tr><td>${avatarHtml(x.photo, x.name, 'xs')}</td><td>${x.name}</td><td>${programChips(x.programs)}</td><td>${d?d.name:'—'}${p?', '+p.name:''}</td>
+        <td class="row-actions">
+        <button class="btn btn-sm" onclick="openTraineeForm('${x.id}',false)">Edit</button>
+        ${hasGraduated ? `<button class="btn btn-sm" onclick="openCertificate('${x.id}')">Certificate</button>` : ''}
+        </td></tr>`;
+    }).join('')}</tbody></table>
+  ` : emptyState('No NIEHUBees registered yet','Register a trainee from your area.');
+}
+
+// isOrg=true lets the organization register/edit a NIEHUBee for any NIEHUBer and any district.
+// isOrg=false (trainer) scopes district choices and trainer assignment to the logged-in NIEHUBer.
+function openTraineeForm(id, isOrg){
+  editingTraineeId = id || null;
+  const existing = id ? DB.niehubees.find(x=>x.id===id) : null;
+  const selfTrainer = currentTrainer();
+  const dists = isOrg ? DB.districts : ((selfTrainer && selfTrainer.districtIds && selfTrainer.districtIds.length) ? DB.districts.filter(d=>selfTrainer.districtIds.includes(d.id)) : DB.districts);
+
+  // programPick maps field -> status, for the fields the trainee is currently assigned to
+  programPick = {};
+  (existing ? existing.programs || [] : []).forEach(p => programPick[p.field] = p.status);
+
+  const trainerPicker = isOrg ? `
+    <div class="form-group"><label>Assigned NIEHUBer</label>
+      <select id="nf-trainer">
+        <option value="">Unassigned</option>
+        ${DB.niehubers.map(t=>`<option value="${t.id}" ${existing && existing.trainerId===t.id?'selected':''}>${t.name}</option>`).join('')}
+      </select>
+    </div>` : '';
+
+  openModal(id ? 'Edit NIEHUBee' : 'Register NIEHUBee', `
+    <form onsubmit="return saveTrainee(event, ${isOrg?'true':'false'})">
+      <div class="avatar-upload-wrap">
+        <div id="nf-photo-preview-wrap">${avatarHtml(existing?existing.photo:null, existing?existing.name:'New', 'lg')}</div>
+        <div>
+          <label class="field-label">Photo (optional)</label>
+          <input type="file" accept="image/*" onchange="handlePhotoInput(this, function(url){ window.__nfPhoto = url; document.getElementById('nf-photo-preview-wrap').innerHTML = avatarHtml(url, document.getElementById('nf-name').value, 'lg'); })">
+          ${existing && existing.photo ? `<button type="button" class="btn btn-sm btn-danger" style="margin-left:6px;" onclick="window.__nfPhoto=null; document.getElementById('nf-photo-preview-wrap').innerHTML=avatarHtml(null, document.getElementById('nf-name').value, 'lg');">Remove</button>` : ''}
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full"><label>Full name</label><input required id="nf-name" value="${existing?existing.name:''}"></div>
+        <div class="form-group"><label>Phone number</label><input id="nf-phone" value="${existing?existing.phone||'':''}"></div>
+        <div class="form-group"><label>Gender</label><select id="nf-gender"><option ${existing?.gender==='Male'?'selected':''}>Male</option><option ${existing?.gender==='Female'?'selected':''}>Female</option></select></div>
+        <div class="form-group"><label>Age</label><input type="number" min="10" id="nf-age" value="${existing&&existing.age?existing.age:''}"></div>
+        ${trainerPicker}
+        <div class="form-group"><label>District</label><select id="nf-district" onchange="refreshTraineeParishes()">${dists.map(d=>`<option value="${d.id}" ${existing&&existing.districtId===d.id?'selected':''}>${d.name}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Parish</label><select id="nf-parish"></select></div>
+        <div class="form-group"><label>Enrollment date</label><input type="date" id="nf-date" value="${existing?existing.enrollmentDate:new Date().toISOString().slice(0,10)}"></div>
+        <div class="form-group full">
+          <label>Fields of study — a NIEHUBee can attend more than one</label>
+          <div class="checklist" id="nf-program-picker">${renderProgramPicker()}</div>
+        </div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">${id?'Save changes':'Register'}</button></div>
+    </form>
+  `);
+  window.__nfPhoto = existing && existing.photo ? existing.photo : null;
+  refreshTraineeParishes(existing ? existing.parishId : null);
+}
+function renderProgramPicker(){
+  return FIELDS.map(f=>{
+    const checked = Object.prototype.hasOwnProperty.call(programPick, f);
+    return `
+      <label><input type="checkbox" onchange="toggleProgramField('${f}', this.checked)" ${checked?'checked':''}> ${f}</label>
+      ${checked ? `<div class="parish-sub">
+        <label style="display:flex;align-items:center;gap:8px;">Status:
+          <select onchange="programPick['${f}']=this.value" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;">
+            ${['Enrolled','In Training','Graduated','Dropped'].map(s=>`<option value="${s}" ${programPick[f]===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </label>
+      </div>` : ''}
+    `;
+  }).join('');
+}
+function toggleProgramField(field, checked){
+  if(checked) programPick[field] = programPick[field] || 'Enrolled';
+  else delete programPick[field];
+  document.getElementById('nf-program-picker').innerHTML = renderProgramPicker();
+}
+function refreshTraineeParishes(preselectParishId){
+  const distId = document.getElementById('nf-district').value;
+  const parishes = DB.parishes.filter(p=>p.districtId===distId);
+  document.getElementById('nf-parish').innerHTML = parishes.length
+    ? parishes.map(p=>`<option value="${p.id}" ${preselectParishId===p.id?'selected':''}>${p.name}</option>`).join('')
+    : `<option value="">—</option>`;
+}
+function saveTrainee(e, isOrg){
+  e.preventDefault();
+  const programs = Object.entries(programPick).map(([field,status])=>({field,status}));
+  if(!programs.length){ toast('Select at least one field of study'); return false; }
+  const data = {
+    name: document.getElementById('nf-name').value.trim(),
+    phone: document.getElementById('nf-phone').value.trim(),
+    gender: document.getElementById('nf-gender').value,
+    age: Number(document.getElementById('nf-age').value)||null,
+    programs,
+    districtId: document.getElementById('nf-district').value,
+    parishId: document.getElementById('nf-parish').value || null,
+    trainerId: isOrg ? (document.getElementById('nf-trainer').value || null) : currentTrainer().id,
+    photo: window.__nfPhoto || null,
+  };
+  if(editingTraineeId){
+    Object.assign(DB.niehubees.find(x=>x.id===editingTraineeId), data);
+    toast('NIEHUBee updated');
+  } else {
+    DB.niehubees.push({ id: uid('ne'), ...data, enrollmentDate: document.getElementById('nf-date').value, status: 'Enrolled' });
+    toast('NIEHUBee registered');
+  }
+  persist('niehubees'); closeModal();
+  if(isOrg) renderTraineeTable(); else renderMyTraineeTable();
+  return false;
+}
+
+/* ================= TRAINER: My Salary ================= */
+function renderTrainerPayments(){
+  const t = currentTrainer();
+  const b = t.benefits || {trainingAllowance:{on:false,amount:0},airtime:{on:false,amount:0},dataBundle:{on:false,amount:0}};
+  const c = document.getElementById('content');
+  const history = DB.payments.filter(p=>p.payeeType==='trainer' && p.payeeId===t.id).sort((a,b2)=>b2.date.localeCompare(a.date));
+  c.innerHTML = `
+    <div class="card">
+      <div class="card-head"><h3>Mobile Money account</h3><button class="btn btn-sm" onclick="openMomoFormFor('trainer','${t.id}')">${t.momoNumber?'Update':'Add'} account</button></div>
+      ${t.momoNumber ? `<div style="font-size:14px;"><strong>${t.momoName||'—'}</strong> · ${t.momoNumber}</div>` : `<div style="color:var(--ink-soft);font-size:13.5px;">No mobile money account on file yet.</div>`}
+    </div>
+    <div class="card">
+      <h3>Base salary & benefits</h3>
+      <div class="benefit-cards">
+        <div class="benefit-card"><div class="tag">Base salary</div><div class="amt">UGX ${(t.baseSalary||0).toLocaleString()}</div></div>
+        <div class="benefit-card ${b.trainingAllowance.on?'':'off'}"><div class="tag">Training allowance</div><div class="amt">${b.trainingAllowance.on?'UGX '+b.trainingAllowance.amount.toLocaleString():'Not enabled'}</div></div>
+        <div class="benefit-card ${b.airtime.on?'':'off'}"><div class="tag">Airtime</div><div class="amt">${b.airtime.on?'UGX '+b.airtime.amount.toLocaleString():'Not enabled'}</div></div>
+        <div class="benefit-card ${b.dataBundle.on?'':'off'}"><div class="tag">Data bundle</div><div class="amt">${b.dataBundle.on?'UGX '+b.dataBundle.amount.toLocaleString():'Not enabled'}</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:12px;margin-bottom:0;">Benefit eligibility is configured by the organization.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3 style="margin:0;">Payment history</h3>
+        <div class="row-actions"><button class="btn btn-sm" onclick="exportMyPaymentsCSV()">Export CSV</button><button class="btn btn-sm" onclick="printPage()">Print</button></div>
+      </div>
+      ${history.length ? `<table><thead><tr><th>Date</th><th>Type</th><th>Amount (UGX)</th><th>Status</th></tr></thead>
+      <tbody>${history.map(p=>`<tr><td>${p.date}</td><td>${p.type}</td><td>${p.amount.toLocaleString()}</td><td>${p.status==='Paid'?'<span class="badge badge-green">Paid</span>':'<span class="badge badge-amber">Pending</span>'}</td></tr>`).join('')}</tbody></table>`
+      : emptyState('No payments recorded yet','Your payment history will appear here once the organization records a payment.')}
+    </div>
+  `;
+}
+function exportMyPaymentsCSV(){
+  const t = currentTrainer();
+  const rows = DB.payments.filter(p=>p.payeeType==='trainer' && p.payeeId===t.id).map(p=>[p.date, p.type, p.amount, p.status]);
+  exportCSV('my-payments.csv', ['Date','Type','Amount (UGX)','Status'], rows);
+}
+/* ================= ORG: Training Log (all NIEHUBers' check-in/out) ================= */
+function renderOrgTrainingLog(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="search-bar">
+      <select id="tl-trainer" onchange="renderTrainingLogTable()"><option value="">All NIEHUBers</option>${DB.niehubers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select>
+      <select id="tl-field" onchange="renderTrainingLogTable()"><option value="">All fields</option>${FIELDS.map(f=>`<option>${f}</option>`).join('')}</select>
+    </div>
+    <div class="card"><div id="tl-wrap"></div></div>
+  `;
+  renderTrainingLogTable();
+}
+function renderTrainingLogTable(){
+  const trainerId = document.getElementById('tl-trainer')?.value || '';
+  const field = document.getElementById('tl-field')?.value || '';
+  let rows = DB.trainingSessions.filter(s => (!trainerId || s.trainerId===trainerId) && (!field || s.fieldOfStudy===field));
+  rows = rows.sort((a,b)=>b.checkIn.localeCompare(a.checkIn));
+  document.getElementById('tl-wrap').innerHTML = `
+    <div class="row-actions" style="justify-content:flex-end;margin-bottom:12px;">
+      <button class="btn btn-sm" onclick="exportTrainingLogCSV()">Export CSV</button>
+      <button class="btn btn-sm" onclick="printPage()">Print</button>
+    </div>
+    ${rows.length ? `
+    <table><thead><tr><th>NIEHUBer</th><th>Field</th><th>Date</th><th>Check-in</th><th>Check-out</th><th>Duration</th><th>Note</th></tr></thead>
+    <tbody>${rows.map(s=>{
+      const t = DB.niehubers.find(x=>x.id===s.trainerId);
+      return `<tr>
+        <td>${t?t.name:'—'}</td><td>${s.fieldOfStudy}</td>
+        <td>${new Date(s.checkIn).toLocaleDateString()}</td>
+        <td>${new Date(s.checkIn).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</td>
+        <td>${s.checkOut ? new Date(s.checkOut).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '<span class="badge badge-amber">Active</span>'}</td>
+        <td>${s.durationMinutes!=null ? formatDuration(s.durationMinutes) : '—'}</td>
+        <td>${s.note||'—'}</td>
+      </tr>`;
+    }).join('')}</tbody></table>
+    ` : emptyState('No training sessions logged yet','Sessions appear here once NIEHUBers start using Check In / Check Out.')}
+  `;
+}
+function exportTrainingLogCSV(){
+  const rows = [...DB.trainingSessions].sort((a,b)=>b.checkIn.localeCompare(a.checkIn)).map(s=>{
+    const t = DB.niehubers.find(x=>x.id===s.trainerId);
+    return [t?t.name:'—', s.fieldOfStudy, s.checkIn, s.checkOut||'', s.durationMinutes!=null?formatDuration(s.durationMinutes):'', s.note||''];
+  });
+  exportCSV('training-log.csv', ['NIEHUBer','Field','Check-in','Check-out','Duration','Note'], rows);
+}
+
+/* ================= Locations Map (real GPS from training check-ins) ================= */
+// Shows real GPS pins captured when NIEHUBers check in for training — not the
+// approximate IP-based location used for Login Activity. filterTrainerId=null
+// shows everyone (org view); pass a NIEHUBer's id to show only their pins.
+let __activeLeafletMap = null;
+function renderLocationsMapPage(filterTrainerId){
+  const c = document.getElementById('content');
+  const sessions = DB.trainingSessions.filter(s => s.lat!=null && s.lng!=null && (!filterTrainerId || s.trainerId===filterTrainerId));
+  c.innerHTML = `
+    <div class="card">
+      <div id="locations-map"></div>
+      <p class="map-offline-note">
+        Pins mark real GPS locations captured when a NIEHUBer checked in for a training session (only sessions where location access was allowed appear here).
+        Map tiles are provided by OpenStreetMap and need an internet connection to load new areas — once an area has been viewed, it stays available offline (cached automatically) until the cache is cleared.
+      </p>
+    </div>
+  `;
+  if(!window.L){ document.getElementById('locations-map').innerHTML = '<div class="empty-state">Map library failed to load — check your connection and reload.</div>'; return; }
+  if(__activeLeafletMap){ __activeLeafletMap.remove(); __activeLeafletMap = null; }
+  const defaultCenter = [1.3733, 32.2903]; // Uganda, roughly centered
+  const map = L.map('locations-map').setView(defaultCenter, 6.3);
+  __activeLeafletMap = map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  if(sessions.length){
+    const markers = [];
+    sessions.forEach(s=>{
+      const t = DB.niehubers.find(x=>x.id===s.trainerId);
+      const m = L.marker([s.lat, s.lng]).addTo(map);
+      m.bindPopup(`
+        <strong>${t?escapeHtml(t.name):'Unknown NIEHUBer'}</strong><br>
+        ${escapeHtml(s.fieldOfStudy)}<br>
+        ${new Date(s.checkIn).toLocaleString()}
+        ${s.gpsAccuracy ? `<br><span style="color:#888;">±${Math.round(s.gpsAccuracy)}m accuracy</span>` : ''}
+      `);
+      markers.push(m);
+    });
+    if(markers.length > 1){
+      map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+    } else {
+      map.setView([sessions[0].lat, sessions[0].lng], 13);
+    }
+  }
+  setTimeout(()=> map.invalidateSize(), 200); // fixes blank tiles when the map renders inside a modal/hidden tab
+}
+function renderOrgLocationsMap(){ renderLocationsMapPage(null); }
+function renderTrainerLocationsMap(){ renderLocationsMapPage(currentTrainer().id); }
+
+/* ================= ORG: Login Activity (device + location) ================= */
+function renderOrgLoginActivity(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="search-bar">
+      <select id="la-trainer" onchange="renderLoginActivityTable()"><option value="">Everyone</option><option value="org">Organization</option>${DB.niehubers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select>
+    </div>
+    <div class="card"><div id="la-wrap"></div></div>
+  `;
+  renderLoginActivityTable();
+}
+function renderLoginActivityTable(){
+  const who = document.getElementById('la-trainer')?.value || '';
+  let rows = [...DB.loginLogs].sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+  if(who==='org') rows = rows.filter(r=>r.viewerType==='org');
+  else if(who) rows = rows.filter(r=>r.trainerId===who);
+  rows = rows.slice(0,200);
+  document.getElementById('la-wrap').innerHTML = `
+    <div class="row-actions" style="justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-sm" onclick="printPage()">Print</button></div>
+    ${rows.length ? `
+    <table><thead><tr><th>Who</th><th>Date</th><th>Time</th><th>Device</th><th>Browser / OS</th><th>Location</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const who2 = r.viewerType==='org' ? 'Organization' : (DB.niehubers.find(t=>t.id===r.trainerId)?.name || 'Former NIEHUBer');
+      const loc = [r.city, r.region, r.country].filter(Boolean).join(', ') || '—';
+      return `<tr><td>${who2}</td><td>${r.date}</td><td>${r.time}</td><td>${r.deviceType}</td><td>${r.browser} · ${r.os}</td><td>${loc}</td></tr>`;
+    }).join('')}</tbody></table>
+    ` : emptyState('No login activity yet','Records appear here every time someone logs in.')}
+  `;
+}
+
+/* ================= Training Materials (org provides, NIEHUBers view) ================= */
+function renderOrgMaterials(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Training materials</h3><button class="btn btn-primary btn-sm" onclick="openMaterialForm()">+ Add material</button></div>
+    <div class="card"><div id="materials-wrap"></div></div>
+  `;
+  renderMaterialsTable(true);
+}
+function renderTrainerMaterials(){
+  const c = document.getElementById('content');
+  c.innerHTML = `<div class="card"><div id="materials-wrap"></div></div>`;
+  renderMaterialsTable(false);
+}
+function renderMaterialsTable(isOrg){
+  const t = isOrg ? null : currentTrainer();
+  let list = DB.materials;
+  if(!isOrg) list = list.filter(m => !t.fieldsOfStudy || !t.fieldsOfStudy.length || m.fieldOfStudy==='Others' || t.fieldsOfStudy.includes(m.fieldOfStudy));
+  list = [...list].sort((a,b)=>b.uploadedDate.localeCompare(a.uploadedDate));
+  document.getElementById('materials-wrap').innerHTML = list.length ? list.map(m=>`
+    <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+        <div>
+          <strong>${escapeHtml(m.title)}</strong> <span class="badge badge-grey" style="margin-left:6px;">${m.fieldOfStudy}</span>
+          ${m.description ? `<p style="font-size:13px;color:var(--ink-soft);margin:6px 0 0;">${linkify(m.description)}</p>` : ''}
+        </div>
+        <div class="row-actions">
+          ${m.fileData ? `<button class="btn btn-sm btn-primary" onclick="downloadDataUrl('${m.fileData}','${m.fileName.replace(/'/g,"")}')">Download</button>` : ''}
+          ${m.linkUrl ? `<a class="btn btn-sm" href="${m.linkUrl}" target="_blank" rel="noopener">Open link</a>` : ''}
+          ${isOrg ? `<button class="btn btn-sm btn-danger" onclick="deleteMaterial('${m.id}')">Delete</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('') : emptyState(isOrg?'No training materials yet':'No materials for your fields yet', isOrg?'Add books, guides or links per training programme.':'The organization hasn\'t shared anything for your fields of study yet.');
+}
+function openMaterialForm(){
+  openModal('Add Training Material', `
+    <form onsubmit="return saveMaterial(event)">
+      <div class="form-grid">
+        <div class="form-group full"><label>Title</label><input required id="mt-title"></div>
+        <div class="form-group"><label>Field of study</label><select id="mt-field">${FIELDS.map(f=>`<option>${f}</option>`).join('')}</select></div>
+        <div class="form-group full"><label>Description (optional)</label><textarea id="mt-desc" rows="2"></textarea></div>
+        <div class="form-group full"><label>External link (optional — e.g. Google Drive / YouTube)</label><input id="mt-link" placeholder="https://..."></div>
+        <div class="form-group full"><label>Or attach a small file (under 700KB)</label><input type="file" id="mt-file"></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Add material</button></div>
+    </form>
+  `);
+}
+function saveMaterial(e){
+  e.preventDefault();
+  const title = document.getElementById('mt-title').value.trim();
+  const fieldOfStudy = document.getElementById('mt-field').value;
+  const description = document.getElementById('mt-desc').value.trim();
+  const linkUrl = document.getElementById('mt-link').value.trim();
+  const fileInput = document.getElementById('mt-file');
+  const finish = (fileData, fileName) => {
+    DB.materials.push({ id: uid('mat'), title, fieldOfStudy, description, linkUrl, fileData: fileData||null, fileName: fileName||null, uploadedDate: new Date().toISOString().slice(0,10) });
+    persist('materials'); closeModal(); renderMaterialsTable(true); toast('Material added');
+  };
+  if(fileInput.files && fileInput.files[0]){
+    handleFileInput(fileInput, 700, (res)=> finish(res.data, res.name));
+  } else {
+    finish(null, null);
+  }
+  return false;
+}
+function deleteMaterial(id){
+  const m = DB.materials.find(x=>x.id===id);
+  if(!confirm(`Remove "${m.title}"?`)) return;
+  DB.materials = DB.materials.filter(x=>x.id!==id);
+  persist('materials'); renderMaterialsTable(true); toast('Material removed');
+}
+
+/* ================= ORG: Settings (appearance, security, org profile) ================= */
+function renderTrainerCorrespondence(){
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="card-head"><h3 style="margin:0;">Messages</h3><button class="btn btn-primary btn-sm" onclick="openComposeForm('trainer')">+ New message</button></div>
+    <div class="card" id="msg-wrap"></div>
+  `;
+  renderMessages(session.trainerId);
+  markMessagesReadForViewer(session.trainerId);
+}
+
+function renderOrgSettings(){
+  const c = document.getElementById('content');
+  const s = DB.orgSettings;
+  c.innerHTML = `
+    <div class="card">
+      <h3>Data storage status</h3>
+      ${storageStatusBanner()}
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0;">This determines whether your team sees the same NIEHUBers, NIEHUBees, and payments no matter which device or browser they use.</p>
+    </div>
+    <div class="card">
+      <h3>Organization profile</h3>
+      <div class="avatar-upload-wrap">
+        <div id="org-logo-preview-wrap">${avatarHtml(s.logo, s.name, 'lg')}</div>
+        <div>
+          <label class="field-label">Logo / photo</label>
+          <input type="file" accept="image/*" onchange="handlePhotoInput(this, function(url){ DB.orgSettings.logo=url; DB.orgSettings.photo=url; persist('orgSettings'); document.getElementById('org-logo-preview-wrap').innerHTML=avatarHtml(url, DB.orgSettings.name, 'lg'); renderSidebar(); toast('Logo updated'); })">
+          ${s.logo ? `<button class="btn btn-sm btn-danger" style="margin-left:6px;" onclick="removeOrgPhoto()">Remove</button>` : ''}
+        </div>
+      </div>
+      <div class="form-group full" style="margin-top:14px;"><label>Organization / academy name</label>
+        <input id="os-name" value="${s.name}" onchange="saveOrgName(this.value)">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Appearance</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Primary color</label>
+          <div class="color-row"><input type="color" id="os-primary" value="${s.primaryColor}"><span style="font-size:12.5px;color:var(--ink-soft);">Buttons, sidebar, highlights</span></div>
+        </div>
+        <div class="form-group"><label>Accent color</label>
+          <div class="color-row"><input type="color" id="os-amber" value="${s.amberColor}"><span style="font-size:12.5px;color:var(--ink-soft);">Allowances & highlights</span></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="saveAppearance()">Save appearance</button>
+    </div>
+
+    <div class="card">
+      <h3>Organization password</h3>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-6px;">Used to log in as the Organization.</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Current password</label><input type="password" id="os-cur-pw"></div>
+        <div class="form-group"><label>New password</label><input type="password" id="os-new-pw"></div>
+      </div>
+      <div id="os-pw-msg"></div>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="changeOrgPassword()">Update password</button>
+    </div>
+  `;
+}
+function saveOrgName(val){
+  DB.orgSettings.name = val.trim() || DEFAULT_ORG_SETTINGS.name;
+  persist('orgSettings'); applyAppearance(); renderSidebar(); toast('Organization name updated');
+}
+function saveAppearance(){
+  DB.orgSettings.primaryColor = document.getElementById('os-primary').value;
+  DB.orgSettings.amberColor = document.getElementById('os-amber').value;
+  persist('orgSettings'); applyAppearance(); toast('Appearance updated');
+}
+function changeOrgPassword(){
+  const cur = document.getElementById('os-cur-pw').value;
+  const next = document.getElementById('os-new-pw').value;
+  const msg = document.getElementById('os-pw-msg');
+  if(cur !== DB.orgSettings.password){ msg.innerHTML = `<div class="login-error">Current password is incorrect.</div>`; return; }
+  if(!next || next.length < 4){ msg.innerHTML = `<div class="login-error">New password must be at least 4 characters.</div>`; return; }
+  DB.orgSettings.password = next;
+  persist('orgSettings');
+  msg.innerHTML = '';
+  document.getElementById('os-cur-pw').value = ''; document.getElementById('os-new-pw').value = '';
+  toast('Organization password updated');
+}
+
+/* ================= TRAINER: My Profile ================= */
+function renderTrainerProfile(){
+  const t = currentTrainer();
+  const c = document.getElementById('content');
+  const dists = (t.districtIds||[]).map(id=>DB.districts.find(d=>d.id===id)?.name).filter(Boolean);
+  c.innerHTML = `
+    <div class="card">
+      <h3>My photo</h3>
+      <div class="avatar-upload-wrap">
+        <div id="my-photo-preview-wrap">${avatarHtml(t.photo, t.name, 'lg')}</div>
+        <div>
+          <label class="field-label">Profile picture</label>
+          <input type="file" accept="image/*" onchange="handlePhotoInput(this, function(url){ t.photo=url; persist('niehubers'); document.getElementById('my-photo-preview-wrap').innerHTML=avatarHtml(url,t.name,'lg'); renderSidebar(); toast('Profile picture updated'); })">
+          ${t.photo ? `<button class="btn btn-sm btn-danger" style="margin-left:6px;" onclick="removeMyPhoto()">Remove photo</button>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>My details</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Name</label><input value="${t.name}" disabled></div>
+        <div class="form-group"><label>Phone</label><input value="${t.phone||''}" disabled></div>
+        <div class="form-group"><label>Fields of study</label><input value="${(t.fieldsOfStudy||[]).join(', ')||'—'}" disabled></div>
+        <div class="form-group"><label>Districts</label><input value="${dists.join(', ')||'—'}" disabled></div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-soft);margin-top:10px;margin-bottom:0;">To update these details, contact the organization.</p>
+    </div>
+    <div class="card">
+      <h3>Change password</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Current password</label><input type="password" id="tp-cur-pw"></div>
+        <div class="form-group"><label>New password</label><input type="password" id="tp-new-pw"></div>
+      </div>
+      <div id="tp-pw-msg"></div>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="changeTrainerPassword()">Update password</button>
+    </div>
+  `;
+}
+function changeTrainerPassword(){
+  const t = currentTrainer();
+  const cur = document.getElementById('tp-cur-pw').value;
+  const next = document.getElementById('tp-new-pw').value;
+  const msg = document.getElementById('tp-pw-msg');
+  if(cur !== (t.password||'2026')){ msg.innerHTML = `<div class="login-error">Current password is incorrect.</div>`; return; }
+  if(!next || next.length < 4){ msg.innerHTML = `<div class="login-error">New password must be at least 4 characters.</div>`; return; }
+  t.password = next;
+  persist('niehubers');
+  msg.innerHTML = '';
+  document.getElementById('tp-cur-pw').value=''; document.getElementById('tp-new-pw').value='';
+  toast('Password updated');
+}
+</script>
+</body>
+</html>
